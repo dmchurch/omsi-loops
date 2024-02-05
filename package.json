@@ -5,6 +5,13 @@
     "@types/gapi.client.drive-v3": "^0.0.4",
     "@types/google.accounts": "^0.0.14",
     "@types/jquery": "^3.5.29",
-    "@types/lz-string": "^1.5.0"
+    "@types/lz-string": "^1.5.0",
+    "assemblyscript": "^0.27.24"
+  },
+  "scripts": {
+    "asbuild:debug": "asc assembly/index.ts --target debug",
+    "asbuild:release": "asc assembly/index.ts --target release",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release",
+    "start": "npx serve ."
   }
 }

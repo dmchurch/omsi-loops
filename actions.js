@@ -410,7 +410,8 @@ class Actions {
 /** @param {AnyActionEntry} action */
 function getRawAdjustedTicks(action, effortCost = action.manaCost(), result = new Rational()) {
     result.setValue(0);
-    for (const statFraction of action.statFractions) {
+    for (let i = 0; i < action.statFractions.length; i++) {
+        const statFraction = action.statFractions[i];
         const actionStatName = statFraction.statName;
         result.add(stats[actionStatName].manaMultiplier.multiplyBy(statFraction));
     }

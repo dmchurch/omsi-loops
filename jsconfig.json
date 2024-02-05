@@ -5,6 +5,6 @@
         "checkJs": true,
         "moduleResolution": "node",
     },
-    "include": ["*.js", "views/*.js", "*.d.ts", "index.html", "types.d.ts"],
-    "files": ["index.html", "types.d.ts"],
+    "include": ["*.js", "views/*.js", "libs/wasm-utilities.js", "*.d.ts", "index.html", "types.d.ts"],
+    "files": ["index.html", "types.d.ts", "libs/wasm-utilities.js"],
 }

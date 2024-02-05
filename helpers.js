@@ -49,7 +49,7 @@ function formatTime(seconds) {
         
         return timeString;
     }
-    if (Number.isInteger(seconds)) {
+    if ((seconds % 1 === 0)) {
         return (formatNumber(seconds) + _txt("time_controls>seconds")).replace(/\B(?=(\d{3})+(?!\d))/gu, ",");
     }
     if (seconds < 10) {
@@ -124,7 +124,7 @@ function toSuffix(value) {
     const suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "O", "N", "Dc", "Ud", "Dd", "Td", "qd", "Qd", "sd", "Sd", "Od", "Nd", "V"];
     const suffixNum = Math.floor(((String(value)).length - 1) / 3);
     const shortValue = parseFloat((suffixNum === 0 ? value : (value / Math.pow(1000, suffixNum))).toPrecision(3));
-    const valueRepr = !Number.isInteger(shortValue) ? shortValue.toPrecision(3) : shortValue.toString();
+    const valueRepr = shortValue % 1 !== 0 ? shortValue.toPrecision(3) : shortValue.toString();
     return valueRepr + suffixes[suffixNum];
 }
 
@@ -647,8 +647,11 @@ function statistics() {
 }
 
 const nullFunc = () => {};
-function benchmark(func, iterations, returnTimeOnly) {
-    const baseCost = (func === nullFunc && returnTimeOnly) ? 0 : benchmark(nullFunc, iterations, true);
+/** @param {number | (() => void)} [costFunc]  */
+function benchmark(func, iterations, costFunc = nullFunc, returnTimeOnly = false) {
+    const baseCost = typeof costFunc === "number" ? costFunc
+                   : (func === costFunc && returnTimeOnly) ? 0
+                   : benchmark(costFunc, iterations, costFunc, true);
     const before = performance.mark("benchmark-start");
     for (let i = 0; i < iterations; i++) {
         func();
@@ -688,25 +691,34 @@ function defineLazyGetter(object, name, getter) {
 
 class ImmutableRational {
     /** @readonly */
-    static zero = new ImmutableRational(0);
+    static get zero() {
+        const r = new ImmutableRational(0);
+        Object.defineProperty(this, "zero", {writable: false, configurable: true, value: r});
+        return r;
+    }
     /** @readonly */
-    static one = new ImmutableRational(1);
-    /** @readonly */
-    static NaN = new ImmutableRational(NaN);
+    static get one() {
+        const r = new ImmutableRational(1);
+        Object.defineProperty(this, "one", {writable: false, configurable: true, value: r});
+        return r;
+    } 
+
+    static finalizers = new FinalizationRegistry(ImmutableRational.dispose);
+
+    /** @type {RationalPtr} */
+    wasmPtr;
 
     static {
-        // make these *really* readonly
-        Object.defineProperties(this, {zero: {writable: false}, one: {writable: false}, NaN: {writable: false}});
+        Data.omitProperties(this.prototype, ["wasmPtr"]);
     }
 
-    /** @readonly @type {number} */
-    num = 0;
-    /** @readonly @type {number} */
-    den = 1;
-
-    /** @type {number} */
-    #approximateValue;
-    get approximateValue() {return this.#approximateValue ??= this.num / this.den;}
+    get num() {
+        return _wasm.rational_num(this.wasmPtr);
+    }
+    get den() {
+        return _wasm.rational_den(this.wasmPtr);
+    }
+    get approximateValue() {return _wasm.rational_approximateValue(this.wasmPtr); }
 
     static fromRatio(ratio = 0, denom = 100) {
         const numX8 = Math.round(ratio * denom * 8);
@@ -716,67 +728,49 @@ class ImmutableRational {
         return new this(numX8 / 8, denom, true);
     }
 
+    /** @param {RationalPtr} wasmPtr  */
+    static dispose(wasmPtr) {
+        if (wasmPtr !== undefined) {
+            _wasm.rational_delete(wasmPtr);
+        }
+    }
+
+    dispose() {
+        ImmutableRational.dispose(this.wasmPtr);
+        this.wasmPtr = undefined;
+        ImmutableRational.finalizers.unregister(this);
+    }
+
     /** @overload @param {number} [numOrRational] @param {number} [denom] @param {boolean} [reduce] */
     /** @overload @param {RationalLike} numOrRational */
     /** @overload @param {number|RationalLike} [numOrRational] @param {number} [denom] @param {boolean} [reduce] */
     /** @param {number|RationalLike} numOrRational */
     constructor(numOrRational = 0, denom = 1, reduce=false) {
-        if (!this.isImmutable) return; // if this is a mutable rational we don't need to do any initialization here
         if (typeof numOrRational === "object" && numOrRational && "num" in numOrRational && "den" in numOrRational) {
             denom = numOrRational.den;
             numOrRational = numOrRational.num;
         } else if (typeof numOrRational !== "number") {
             numOrRational = NaN;
         }
-        if (reduce) {
-            const gcd = ImmutableRational.gcd(numOrRational, denom);
-            if (gcd !== 1) {
-                numOrRational /= gcd;
-                denom /= gcd;
-            }
-        }
-        Object.defineProperties(this, {
-            num: {
-                value: numOrRational,
-                enumerable: true,
-                configurable: true,
-                writable: false,
-            },
-            den: {
-                value: denom,
-                enumerable: true,
-                configurable: true,
-                writable: false,
-            }
-        });
+        this.wasmPtr = _wasm.rational_new(numOrRational, denom, reduce);
+        ImmutableRational.finalizers.register(this, this.wasmPtr)
     }
 
     get isImmutable() {
         return true;
     }
 
-    /** @overload @param {true} immutable @param {number} [num] @param {number} [den] @param {boolean} [reprototype] @returns {ImmutableRational} */
-    /** @overload @param {true} immutable @param {RationalLike} rational @returns {ImmutableRational} */
-    /** @overload @param {false} immutable @param {number} [num] @param {number} [den] @param {boolean} [reprototype] @returns {Rational} */
-    /** @overload @param {false} immutable @param {RationalLike} rational @returns {Rational} */
-    /** @overload @param {boolean} immutable @param {number|RationalLike} [num] @param {number} [den] @param {boolean} [reprototype] @returns {Rational|ImmutableRational} */
-    /** @param {number|RationalLike} [num] @returns {Rational|ImmutableRational} */
-    setImmutable(immutable = true, num = this.num, den = this.den, reprototype = true) {
-        if (typeof num === "object" && num) {
-            den = num.den;
-            num = num.num;
-        }
-        if (num !== this.num || den !== this.den) {
-            this.#approximateValue = undefined;
-        }
-        Object.defineProperties(this, {
-            num: {writable: !immutable, configurable: true, value: num}, 
-            den: {writable: !immutable, configurable: true, value: den},
-        });
-        if (!immutable && reprototype && !this.isImmutable) {
-            Object.setPrototypeOf(this, Rational.prototype);
-        }
-        return this;
+    /** @param {number|RationalLike} [num] @param {number|RationalLike} [den] @returns {ImmutableRational} */
+    setImmutable(num = this.num, den = this.den, reduce = false) {
+        return Rational.prototype.setValue.call(this, num, den, reduce);
+    }
+
+    /**
+     * Convenience/signpost function for treating an ImmutableRational as mutable. This doesn't reprototype,
+     * so you still can't call setValue() etc, but you can pass it as a result parameter.
+     */
+    asMutable() {
+        return /** @type {Rational} */(/** @type {unknown} */(this));
     }
 
     /**
@@ -789,7 +783,7 @@ class ImmutableRational {
     }
 
     toString() {
-        return Number.isInteger(this.approximateValue) ? this.approximateValue.toString()
+        return (this.approximateValue % 1 === 0) ? this.approximateValue.toString()
              : this.num > this.den ? `${Math.trunc(this.approximateValue)}\u202F${this.num % this.den}⁄${this.den}` // 202F - narrow nbsp
              : this.num < -this.den ? `${Math.trunc(this.approximateValue)}\u202F${-this.num % this.den}⁄${this.den}`
              : `${this.num}⁄${this.den}`; // that's a fraction slash ⁄ not a regular slash /
@@ -800,12 +794,11 @@ class ImmutableRational {
     }
 
     setDirty() {
-        this.#approximateValue = undefined;
         return this;
     }
 
     isNaN() {
-        return isNaN(this.num) || isNaN(this.den);
+        return isNaN(this.approximateValue);
     }
 
     clone() {
@@ -892,50 +885,16 @@ class ImmutableRational {
     }
 
     static gcd(u = 0, v = 0) {
-        if (isNaN(u) || isNaN(v)) {
+        if (u !== u || v !== v) { // so much faster than isNaN(u) || isNaN(v), I hate it
             return NaN;
-        } else if (u === 0 || u === v) {
-            return v;
-        } else if (u === 1 || v === 1) {
-            return 1;
-        } else if (v === 0) {
-            return u;
-        } else if (!Number.isInteger(u) || !Number.isInteger(v)) {
+        } else if (u % 1 !== 0 || v % 1 !== 0) {
             return undefined;
-        } else {
-            let gcd = 1;
-            u = Math.abs(u);
-            v = Math.abs(v);
-            let u2 = u / 2;
-            let v2 = v / 2;
-            while (u !== v) {
-                if (Number.isInteger(u2) && Number.isInteger(v2)) {
-                    u = u2;
-                    v = v2;
-                    u2 = u / 2;
-                    v2 = v / 2;
-                    gcd *= 2;
-                } else if (Number.isInteger(u2)) {
-                    u = u2;
-                    u2 = u / 2;
-                } else if (Number.isInteger(v2)) {
-                    v = v2;
-                    v2 = v / 2;
-                } else if (u > v) {
-                    u -= v;
-                    u2 = u / 2;
-                } else {
-                    v -= u;
-                    v2 = v / 2;
-                }
-            }
-            gcd *= u;
-            return gcd;
         }
+        return _wasm.gcd(u, v);
     }
 
     static lcm(u = 0, v = 0) {
-        if (isNaN(u) || isNaN(v)) return NaN;
+        if (u !== u || v !== v) return NaN; // isNaN(u) || isNaN(v)
         if (u === v) return u;
         const gcd = this.gcd(u, v);
         return gcd === u ? v
@@ -947,58 +906,34 @@ class ImmutableRational {
 }
 
 class Rational extends ImmutableRational {
-    num = 0;
-    den = 1;
-
-    get isImmutable() { return !Object.getOwnPropertyDescriptor(this, "num").writable && !Object.getOwnPropertyDescriptor(this, "den").writable; }
-
-    /** @overload @param {number} [num] @param {number} [den] @param {boolean} [reduce] */
-    /** @overload @param {RationalLike} rational */
-    /** @param {number|RationalLike} numOrRational */
-    constructor(numOrRational = 0, denom = 1, reduce = false) {
-        super(0, 1, false);
-        
-        if (typeof numOrRational === "object" && numOrRational && "num" in numOrRational && "den" in numOrRational) {
-            denom = numOrRational.den;
-            numOrRational = numOrRational.num;
-        } else if (typeof numOrRational !== "number") {
-            numOrRational = NaN;
-        }
-        this.num = numOrRational;
-        this.den = denom;
-
-        if (reduce) this.reduce();
+    get num() {
+        return _wasm.rational_num(this.wasmPtr);
     }
-    /** @overload @param {true} immutable @param {number} [num] @param {number} [den] @returns {ImmutableRational} */
-    /** @overload @param {true} immutable @param {RationalLike} rational @returns {ImmutableRational} */
-    /** @overload @param {false} immutable @param {number} [num] @param {number} [den] @returns {Rational} */
-    /** @overload @param {false} immutable @param {RationalLike} rational @returns {Rational} */
-    /** @overload @param {boolean} immutable @param {number|RationalLike} [num] @param {number} [den] @param {boolean} [reprototype] @returns {Rational|ImmutableRational} */
-    /** @param {number|RationalLike} [num] @returns {Rational|ImmutableRational} */
-    setImmutable(immutable = true, num = this.num, den = this.den, reprototype = true) {
-        super.setImmutable(immutable, num, den, reprototype);
-        if (immutable && reprototype) {
-            Object.setPrototypeOf(this, ImmutableRational.prototype);
-        }
-        return this;
+    set num(n) {
+        _wasm.rational_setnum(this.wasmPtr, n);
     }
+    get den() {
+        return _wasm.rational_den(this.wasmPtr);
+    }
+    set den(d) {
+        _wasm.rational_setden(this.wasmPtr, d);
+    }
+
+    get isImmutable() { return false; }
 
     /**
-     * Convenience function to make the num/den fields read-only without reprototyping the object. Does not
-     * reprototype the object as {@link setImmutable} does
+     * Convenience function to retype this as an ImmutableRational to avoid accidental overwrites
      * @returns {ImmutableRational}
      */
     freeze() {
-        this.setImmutable(true, undefined, undefined, false);
         return this;
     }
 
     /**
-     * Convenience function to make the num/den fields writable, after a freeze().
+     * Convenience function to retype as a Rational, after a freeze().
      * @returns {Rational}
      */
     thaw() {
-        this.setImmutable(false, undefined, undefined, false);
         return this;
     }
 
@@ -1006,43 +941,20 @@ class Rational extends ImmutableRational {
     /** @param {number|RationalLike} [num] @param {number|RationalLike} [den] */
     setValue(num = this.num, den = undefined, reduce = false) {
         if (typeof num !== "number" || typeof den !== "number") {
-            let n = 1, d = 1;
             if (typeof num === "number") {
-                n = num;
+                _wasm.rational_setValue(this.wasmPtr, num, 1);
             } else if (typeof num === "object" && num) {
-                n = num.num;
-                d = num.den;
+                _wasm.rational_setValue(this.wasmPtr, num.num, num.den);
+            } else {
+                _wasm.rational_setValue(this.wasmPtr, 1, 1)
             }
             if (typeof den === "number") {
-                d *= den;
+                _wasm.rational_mulRD(this.wasmPtr, null, 1, den, reduce);
             } else if (typeof den === "object" && den) {
-                n *= den.den;
-                d *= den.num;
+                _wasm.rational_mulRD(this.wasmPtr, null, den.den, den.num, reduce);
             }
-            num = n;
-            den = d;
-        }
-
-        if (reduce) {
-            if (den < 0) {
-                // denominator must be positive
-                num = -num;
-                den = -den;
-            }
-            // irregular fractions can't be reduced
-            if (Number.isInteger(num) && Number.isInteger(den)) {
-                const gcd = Rational.gcd(num, den);
-                if (isFinite(gcd) && gcd !== 1) {
-                    num /= gcd;
-                    den /= gcd;
-                }
-            }
-        }
-
-        if (this.num !== num || this.den !== den) {
-            this.num = num;
-            this.den = den;
-            this.setDirty();
+        } else {
+            _wasm.rational_setValue(this.wasmPtr, num, den, reduce);
         }
 
         return this;
@@ -1096,70 +1008,108 @@ class Rational extends ImmutableRational {
     }
 
     /** @param {RationalLike} lhs @param {RationalLike|number} rhs */
-    static add(lhs, rhs, result = new Rational(), reduce = true) {
-        if (typeof rhs === "number") {
-            result.setValue(lhs.num + lhs.den * rhs,
-                            lhs.den,
-                            reduce);
+    static add(lhs, rhs, result = new Rational(), reduce = false) {
+        if (lhs instanceof ImmutableRational) {
+            if (rhs instanceof ImmutableRational) {
+                _wasm.rational_addRR(result.wasmPtr, lhs.wasmPtr, rhs.wasmPtr, reduce);
+            } else if (typeof rhs === "number") {
+                _wasm.rational_addRI(result.wasmPtr, lhs.wasmPtr, rhs, reduce);
+            } else {
+                _wasm.rational_addRD(result.wasmPtr, lhs.wasmPtr, rhs.num, rhs.den, reduce);
+            }
         } else {
-            const lcm = this.lcm(lhs.den, rhs.den);
-            result.setValue((lhs.den === lcm ? lhs.num : lcm === undefined ? lhs.num * rhs.den : lhs.num * lcm / lhs.den) 
-                          + (rhs.den === lcm ? rhs.num : lcm === undefined ? rhs.num * lhs.den : rhs.num * lcm / rhs.den),
-                        lcm ?? lhs.den * rhs.den,
-                        reduce);
+            if (rhs instanceof ImmutableRational) {
+                _wasm.rational_addRD(result.wasmPtr, rhs.wasmPtr, lhs.num, lhs.den, reduce);
+            } else if (typeof rhs === "number") {
+                _wasm.rational_addDD(result.wasmPtr, lhs.num, lhs.den, rhs, 1, reduce);
+            } else {
+                _wasm.rational_addDD(result.wasmPtr, lhs.num, lhs.den, rhs.num, rhs.den, reduce);
+            }
         }
         return result;
     }
 
     /** @param {RationalLike} lhs @param {RationalLike|number} rhs */
-    static subtract(lhs, rhs, result = new Rational(), reduce = true) {
-        if (typeof rhs === "number") {
-            result.setValue(lhs.num - lhs.den * rhs,
-                            lhs.den,
-                            reduce);
+    static subtract(lhs, rhs, result = new Rational(), reduce = false) {
+        if (lhs instanceof ImmutableRational) {
+            if (rhs instanceof ImmutableRational) {
+                _wasm.rational_subRR(result.wasmPtr, lhs.wasmPtr, rhs.wasmPtr, reduce);
+            } else if (typeof rhs === "number") {
+                _wasm.rational_subRI(result.wasmPtr, lhs.wasmPtr, rhs, reduce);
+            } else {
+                _wasm.rational_addRD(result.wasmPtr, lhs.wasmPtr, -rhs.num, rhs.den, reduce);
+            }
         } else {
-            const lcm = this.lcm(lhs.den, rhs.den);
-            result.setValue((lhs.den === lcm ? lhs.num : lcm === undefined ? lhs.num * rhs.den : lhs.num * lcm / lhs.den) 
-                          - (rhs.den === lcm ? rhs.num : lcm === undefined ? rhs.num * lhs.den : rhs.num * lcm / rhs.den),
-                        lcm ?? lhs.den * rhs.den,
-                        reduce);
+            if (rhs instanceof ImmutableRational) {
+                _wasm.rational_negate(result.wasmPtr, rhs.wasmPtr);
+                _wasm.rational_addRD(result.wasmPtr, null, lhs.num, lhs.den, reduce);
+            } else if (typeof rhs === "number") {
+                _wasm.rational_addDD(result.wasmPtr, lhs.num, lhs.den, -rhs, 1, reduce);
+            } else {
+                _wasm.rational_addDD(result.wasmPtr, lhs.num, lhs.den, -rhs.num, rhs.den, reduce);
+            }
         }
         return result;
     }
 
     /** @param {RationalLike} lhs @param {RationalLike|number} rhs */
-    static multiply(lhs, rhs, result = new Rational(), reduce = true) {
-        if (typeof rhs === "number") {
-            result.setValue(lhs.num * rhs,
-                            lhs.den,
-                            reduce);
+    static multiply(lhs, rhs, result = new Rational(), reduce = false) {
+        if (lhs instanceof ImmutableRational) {
+            if (rhs instanceof ImmutableRational) {
+                _wasm.rational_mulRR(result.wasmPtr, lhs.wasmPtr, rhs.wasmPtr, reduce);
+            } else if (typeof rhs === "number") {
+                _wasm.rational_mulRI(result.wasmPtr, lhs.wasmPtr, rhs, reduce);
+            } else {
+                _wasm.rational_mulRD(result.wasmPtr, lhs.wasmPtr, rhs.num, rhs.den, reduce);
+            }
         } else {
-            result.setValue(lhs.num * rhs.num,
-                            lhs.den * rhs.den,
-                            reduce);
+            if (rhs instanceof ImmutableRational) {
+                _wasm.rational_mulRD(result.wasmPtr, rhs.wasmPtr, lhs.num, lhs.den, reduce);
+            } else if (typeof rhs === "number") {
+                _wasm.rational_mulDD(result.wasmPtr, lhs.num, lhs.den, rhs, 1, reduce);
+            } else {
+                _wasm.rational_mulDD(result.wasmPtr, lhs.num, lhs.den, rhs.num, rhs.den, reduce);
+            }
         }
         return result;
     }
 
     /** @param {RationalLike} lhs @param {RationalLike|number} rhs */
-    static divide(lhs, rhs, result = new Rational(), reduce = true) {
-        if (typeof rhs === "number") {
-            result.setValue(lhs.num,
-                            lhs.den * rhs,
-                            reduce);
+    static divide(lhs, rhs, result = new Rational(), reduce = false) {
+        if (lhs instanceof ImmutableRational) {
+            if (rhs instanceof ImmutableRational) {
+                _wasm.rational_divRR(result.wasmPtr, lhs.wasmPtr, rhs.wasmPtr, reduce);
+            } else if (typeof rhs === "number") {
+                _wasm.rational_divRI(result.wasmPtr, lhs.wasmPtr, rhs, reduce);
+            } else {
+                _wasm.rational_mulRD(result.wasmPtr, lhs.wasmPtr, rhs.den, rhs.num, reduce);
+            }
         } else {
-            result.setValue(lhs.num * rhs.den,
-                            lhs.den * rhs.num,
-                            reduce);
+            if (rhs instanceof ImmutableRational) {
+                _wasm.rational_invert(result.wasmPtr, rhs.wasmPtr);
+                _wasm.rational_mulRD(result.wasmPtr, null, lhs.num, lhs.den, reduce);
+            } else if (typeof rhs === "number") {
+                _wasm.rational_mulDD(result.wasmPtr, lhs.num, lhs.den, 1, rhs, reduce);
+            } else {
+                _wasm.rational_mulDD(result.wasmPtr, lhs.num, lhs.den, rhs.den, rhs.num, reduce);
+            }
         }
         return result;
     }
 
+    /** @type {Rational} */
+    static #scratch;
     /** @param {RationalLike} lhs @param {RationalLike|number} rhs */
     static compare(lhs, rhs) {
-        return typeof rhs === "number" ? lhs.num - lhs.den * rhs
-             : (lhs.den === rhs.den) ? (lhs.num - rhs.num)
-             : (lhs.num * rhs.den - rhs.num * lhs.den);
+        const lptr = lhs instanceof ImmutableRational ? lhs.wasmPtr
+                    : (this.#scratch ??= new Rational(lhs.num, lhs.den)).setValue(lhs.num, lhs.den).wasmPtr;
+        if (rhs instanceof ImmutableRational) {
+            return _wasm.rational_cmpRR(lptr, rhs.wasmPtr);
+        } else if (typeof rhs === "number") {
+            return rhs % 1 === 0 ? _wasm.rational_cmpRI(lptr, rhs) : _wasm.rational_cmpRF(lptr, rhs);
+        } else {
+            return _wasm.rational_cmpRD(lptr, rhs.num, rhs.den);
+        }
     }
 
 }

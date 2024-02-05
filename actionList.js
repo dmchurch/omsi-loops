@@ -270,8 +270,10 @@ class Action extends Localizable {
         }
 
         for (const fraction of statFractions) {
-            fraction.setImmutable(true, fraction.dividedBy(total));
+            Rational.divide(fraction, total, fraction.asMutable(), true);
         }
+        
+        total.reduce();
 
         // sort these by the same order used in stat tooltips
         statFractions.sort((a, b) => (b.compareTo(a) || statList.indexOf(a.statName) - statList.indexOf(b.statName)));

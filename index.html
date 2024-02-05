@@ -26,6 +26,7 @@
     <script src='lib/lz-string.min.js'></script>
     <script src='lib/d3.v7.min.js'></script>
     <script src='lib/mousetrap.min.js'></script>
+    <script src='lib/wasm-utilities.js'></script>
 
     <script src='polyfills.js'></script>
 
@@ -539,9 +540,9 @@
     <script src="views/buffs.view.js"></script>
     <script src="views/talenttree.view.js"></script>
     <script>
-        loadDefaults();
         let initInterval = setInterval(() => {
-            if (locCheck) {
+            if (locCheck && _wasm) {
+                loadDefaults();
                 clearInterval(initInterval);
                 initInterval = undefined;
                 locCheck = undefined;

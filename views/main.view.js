@@ -1173,7 +1173,7 @@ class View {
             const stat = fraction.statName;
             const ratio = fraction.approximateValue;
             const statLabel = _txt(`stats>${stat}>short_form`);
-            actionStats += `<dt class='stat-${stat}'>${statLabel}</dt> <dd class='stat-${stat}'>${fraction.times(100)}%</dd>`;
+            actionStats += `<dt class='stat-${stat}'>${statLabel}</dt> <dd class='stat-${stat}'>${fraction.times(100).reduce()}%</dd>`;
             const startRatio = totalFraction.clone();
             totalFraction.add(fraction);
             const midRatio = startRatio.plus(totalFraction).divideBy(2);

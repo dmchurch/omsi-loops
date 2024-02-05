@@ -47,3 +47,46 @@ declare interface AssassinAction<const N, const E> {
 }
 
 declare const LZString = await import("lz-string");
+
+/**
+ * RationalPtr is a fake type which does not exist. It is actually a number.
+ */
+declare interface RationalPtr {
+    #brand;
+}
+declare interface WasmUtilities {
+    rational_new(num = 0, den = 1, reduce = false): RationalPtr;
+    rational_delete(rational: RationalPtr): void;
+    rational_count(): number;
+    rational_newcount(): number;
+    rational_num(rational: RationalPtr): number;
+    rational_setnum(rational: RationalPtr, num: number): void;
+    rational_den(rational: RationalPtr): number;
+    rational_setden(rational: RationalPtr, den: number): void;
+    rational_approximateValue(rational: RationalPtr): number;
+    rational_setValue(rational: RationalPtr, num?: number, den?: number, reduce = false): void;
+    rational_reduce(rational: RationalPtr, source?: RationalPtr): void;
+    rational_negate(rational: RationalPtr, source?: RationalPtr): void;
+    rational_invert(rational: RationalPtr, source?: RationalPtr): void;
+    rational_addRR(rational: RationalPtr, lhs?: RationalPtr, rhs?: RationalPtr, reduce = false): void;
+    rational_addRD(rational: RationalPtr, lhs?: RationalPtr, rhsnum: number, rhsden: number, reduce = false): void;
+    rational_addDD(rational: RationalPtr, lhsnum: number, lhsden: number, rhsnum: number, rhsden: number, reduce = false): void;
+    rational_addRI(rational: RationalPtr, lhs: RationalPtr, rhs: number, reduce = false): void;
+    rational_subRR(rational: RationalPtr, lhs?: RationalPtr, rhs?: RationalPtr, reduce = false): void;
+    rational_subRI(rational: RationalPtr, lhs: RationalPtr, rhs: number, reduce = false): void;
+    rational_subIR(rational: RationalPtr, lhs: number, rhs?: RationalPtr, reduce = false): void;
+    rational_mulRR(rational: RationalPtr, lhs?: RationalPtr, rhs?: RationalPtr, reduce = false): void;
+    rational_mulRD(rational: RationalPtr, lhs?: RationalPtr, rhsnum: number, rhsden: number, reduce = false): void;
+    rational_mulDD(rational: RationalPtr, lhsnum: number, lhsden: number, rhsnum: number, rhsden: number, reduce = false): void;
+    rational_mulRI(rational: RationalPtr, lhs: RationalPtr, rhs: number, reduce = false): void;
+    rational_divRR(rational: RationalPtr, lhs?: RationalPtr, rhs?: RationalPtr, reduce = false): void;
+    rational_divRI(rational: RationalPtr, lhs: RationalPtr, rhs: number, reduce = false): void;
+    rational_divIR(rational: RationalPtr, lhs: number, rhs?: RationalPtr, reduce = false): void;
+    rational_cmpRR(rational: RationalPtr, other: RationalPtr): number;
+    rational_cmpRD(rational: RationalPtr, othernum: number, otherden: number): number;
+    rational_cmpRI(rational: RationalPtr, other: number): number;
+    rational_cmpRF(rational: RationalPtr, other: number): number;
+    gcd(u: number, v: number): number,
+  }
+  
+  declare let _wasm: WasmUtilities;
