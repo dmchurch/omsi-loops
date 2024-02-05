@@ -8,9 +8,10 @@
  * 
  * The comments here assume X as the number specified in "loops" and M as the manaCost() of the
  * action in question.
- * @typedef {"actions"      // perform X actions and then stop
- *         | "maxMana"      // Multipart actions: Spend no more than X * M adjusted mana, stop before starting an action that would overflow
- *         | "maxEffort"    // Multipart actions: Spend no more than X * M original mana, stop before starting an action that would overflow
+ * @typedef {"actions"      // Non-multipart actions: perform X actions and then stop
+ *         | "segments"     // Multipart actions: Finish X segments and then stop
+ *         | "maxMana"      // Multipart actions: Spend no more than X * M mana, stop before starting an action that would overflow
+ *         | "maxEffort"    // Multipart actions: Spend no more than X * M effort, stop before starting an action that would overflow
  *         | "knownGood"    // Limited actions: perform at most X actions, only targeting known-good items
  *         | "unchecked"    // Limited actions: perform at most X actions, only targeting unknown items
  * } ActionLoopType
@@ -21,20 +22,22 @@
  * {@link AnyActionEntry} is the resulting typedef.
  * 
  * @typedef CurrentActionEntry
- * @prop {ActionLoopType} loopsType
- * @prop {number} loops
- * @prop {number} loopsLeft
- * @prop {number} extraLoops
- * @prop {number} ticks
- * @prop {number} [adjustedTicks]
- * @prop {number} [rawTicks]
- * @prop {number} manaUsed
- * @prop {number} lastMana
- * @prop {number} manaRemaining
- * @prop {number} goldRemaining
- * @prop {number} timeSpent
- * @prop {number} effectiveTimeElapsed
- * @prop {string} [errorMessage]
+ * @prop {ActionLoopType} loopsType             What does the loops property measure?
+ * @prop {number} loops                         How long should we perform this action?
+ * @prop {number} loopsLeft                     How many loops still need to be performed, incluing the current?
+ * @prop {number} extraLoops                    How many extra loops were added to this action (e.g. from "Repeat last action")?
+ * @prop {number} ticks                         How much mana has been spent towards this loop of the action?
+ * @prop {ImmutableRational} [adjustedTicks]    How much mana is required to complete this action (respecting fracmana)?
+ * @prop {ImmutableRational} [rawTicks]         How much mana is required to complete this action, without rounding?
+ * @prop {number} manaUsed                      How much mana has been spent towards this action in total?
+ * @prop {number} effortSpent                   How much effort has been generated towards this action in total?
+ * @prop {number} actionCompletions             How many times has a simple action or multipart segment been completed?
+ * @prop {number} lastMana                      How much actual mana was spent towards the last successful loop of the action?
+ * @prop {number} manaRemaining                 How much mana remained at the end of the last successful loop of the action?
+ * @prop {number} goldRemaining                 How much gold remained?
+ * @prop {number} timeSpent                     How much in-game time was spent over the course of this action?
+ * @prop {number} effectiveTimeElapsed          How much in-game time was spent in the loop, up through the end of the action?
+ * @prop {string} [errorMessage]                If this action failed: why?
  * }} 
  * @typedef {CurrentActionEntry & AnyActionType} AnyActionEntry
  */
@@ -43,11 +46,11 @@
  * NextActionEntry is the shorthand object stored in {@link Actions.next} array. It does not have an Action prototype.
  * 
  * @typedef NextActionEntry
- * @prop {ActionName} name
- * @prop {number}     loops
- * @prop {boolean}    disabled
- * @prop {boolean}    [collapsed]
- * @prop {ActionLoopType} [loopsType]
+ * @prop {ActionName} name                  The action's .name property, used as a lookup
+ * @prop {number}     loops                 How long should wee perform this action?
+ * @prop {boolean}    disabled              Is this action user-disabled?
+ * @prop {boolean}    [collapsed]           Is this travel action user-collapsed?
+ * @prop {ActionLoopType} [loopsType]       What does the loops property measure?
  */
 
 /** @param {AnyActionEntry} action @returns {action is MultipartAction} */
@@ -75,6 +78,7 @@ class Actions {
         Data.omitProperties(this.prototype, ["next", "nextLast"]);
     }
 
+    /** @param {number} [availableMana] */
     tick(availableMana) {
         availableMana ??= 1;
         availableMana = Mana.floor(availableMana);
@@ -93,7 +97,7 @@ class Actions {
         // restrict to the number of ticks it takes to get to a next talent level.
         manaToSpend = Math.min(manaToSpend, getMaxTicksForAction(curAction, true));
         // restrict to the number of ticks it takes to finish the current action
-        manaToSpend = Math.min(manaToSpend, Mana.ceil(curAction.adjustedTicks - curAction.ticks));
+        manaToSpend = Math.min(manaToSpend, Mana.ceil(curAction.adjustedTicks.approximateValue - curAction.ticks));
         // just in case
         if (manaToSpend < 0) manaToSpend = 0;
 
@@ -127,14 +131,14 @@ class Actions {
             // don't go any further than will get to the next level of whatever stat is being used for this segment
             let manaLeftForCurrentSegment = Math.min(manaLeft, getMaxTicksForStat(curAction, curAction.loopStats[segment], false));
             manaToSpend = 0;
-            const tickMultiplier = (curAction.manaCost() / curAction.adjustedTicks);
+            const tickMultiplier = (curAction.manaCost() / curAction.adjustedTicks.approximateValue);
             let partUpdateRequired = false;
 
             manaLoop:
             while (manaLeftForCurrentSegment > 0 && curAction.canMakeProgress(segment)) {
                 //const toAdd = curAction.tickProgress(segment) * (curAction.manaCost() / curAction.adjustedTicks);
                 const loopStat = stats[loopStats[(loopCounter + segment) % loopStats.length]];
-                const progressMultiplier = curAction.tickProgress(segment) * tickMultiplier * loopStat.effortMultiplier;
+                const progressMultiplier = curAction.tickProgress(segment) * tickMultiplier * loopStat.effortMultiplier.approximateValue;
                 const toAdd = Math.min(
                     manaLeftForCurrentSegment * progressMultiplier, // how much progress would we make if we spend all available mana?
                     loopCost(segment) - curProgress // how much progress would it take to complete this segment?
@@ -196,12 +200,12 @@ class Actions {
         // exp gets added here, where it can factor in to adjustTicksNeeded
         addExpFromAction(curAction, manaToSpend);
 
-        if (curAction.ticks >= curAction.adjustedTicks) {
+        if (curAction.ticks >= curAction.adjustedTicks.approximateValue) {
             curAction.ticks = 0;
             curAction.loopsLeft--;
 
-            curAction.lastMana = curAction.rawTicks;
-            this.completedTicks += curAction.adjustedTicks;
+            curAction.lastMana = curAction.rawTicks.approximateValue;
+            this.completedTicks += curAction.adjustedTicks.approximateValue;
             curAction.finish();
             totals.actions++;
             curAction.manaRemaining = timeNeeded - timer;
@@ -362,7 +366,7 @@ class Actions {
         for (let i = this.currentPos; i < this.current.length; i++) {
             const action = this.current[i];
             setAdjustedTicks(action);
-            remainingTicks += action.loopsLeft * action.adjustedTicks;
+            remainingTicks += action.loopsLeft * action.adjustedTicks.approximateValue;
         }
         this.totalNeeded = this.completedTicks + remainingTicks;
         view.requestUpdate("updateTotalTicks", null);
@@ -403,13 +407,34 @@ class Actions {
     }
 }
 
-function setAdjustedTicks(action) {
-    let newCost = 0;
-    for (const actionStatName in action.stats){
-        newCost += action.stats[actionStatName] * stats[actionStatName].manaMultiplier;
+/** @param {AnyActionEntry} action */
+function getRawAdjustedTicks(action, effortCost = action.manaCost(), result = new Rational()) {
+    result.setValue(0);
+    for (const statFraction of action.statFractions) {
+        const actionStatName = statFraction.statName;
+        result.add(stats[actionStatName].manaMultiplier.multiplyBy(statFraction));
     }
-    action.rawTicks = action.manaCost() * newCost - (options.fractionalMana ? 0 : 0.000001);
-    action.adjustedTicks = Math.max(options.fractionalMana ? 0 : 1, Mana.ceil(action.rawTicks));
+    return result.multiplyBy(effortCost);
+}
+
+/** @param {RationalLike} rawTicks */
+function roundAdjustedTicks(rawTicks, result = new Rational()) {
+    result.setValue(rawTicks);
+    if (!options.fractionalMana) {
+        result.ceilThis()
+    }
+    return result.clamp(options.fractionalMana ? 0 : 1, null);
+}
+
+/** @param {AnyActionEntry} action */
+function getAdjustedTicks(action, effortCost = action.manaCost(), result = new Rational()) {
+    return roundAdjustedTicks(getRawAdjustedTicks(action, effortCost, result), result);
+}
+
+/** @param {AnyActionEntry} action */
+function setAdjustedTicks(action) {
+    action.rawTicks = getRawAdjustedTicks(action, undefined, action.rawTicks?.thaw()).freeze();
+    action.adjustedTicks = roundAdjustedTicks(action.rawTicks, action.adjustedTicks?.thaw()).freeze();
 }
 
 function calcSoulstoneMult(soulstones) {

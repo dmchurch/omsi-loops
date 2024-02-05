@@ -199,6 +199,17 @@ const townNames = ["Beginnersville", "Forest Path", "Merchanton", "Mt. Olympus",
 
 // actions are all sorted below by town in order
 
+class StatFraction extends ImmutableRational {
+    /** @type {StatName} */
+    statName;
+
+    /** @param {StatName} statName  */
+    constructor(statName, ratio = 0) {
+        super(Rational.fromRatio(ratio, 100));
+        this.statName = statName;
+    }
+}
+
 /**
  * @template {string} N The name passed to the constructor
  * @template {ActionExtras} [E=ActionExtras] The extras parameter passed to the constructor
@@ -239,9 +250,38 @@ class Action extends Localizable {
     get label() { return this.memoize("label"); }
     get labelDone() { return this.memoize("labelDone", ">label_done"); }
 
+    /** @type {readonly StatFraction[]} */
+    get statFractions() {
+        /** @type {StatFraction[]} */
+        const statFractions = [];
+
+        // put this on the same prototype level as .stats
+        let target = this;
+        while (target && !Object.hasOwn(target, "stats")) {
+            target = Object.getPrototypeOf(target);
+        }
+
+        let total = new Rational();
+
+        for (const [statName, ratio] of /** @type {[StatName, number][]} */(Object.entries(this.stats))) {
+            const fraction = new StatFraction(statName, ratio);
+            statFractions.push(fraction);
+            total.add(fraction);
+        }
+
+        for (const fraction of statFractions) {
+            fraction.setImmutable(true, fraction.dividedBy(total));
+        }
+
+        // sort these by the same order used in stat tooltips
+        statFractions.sort((a, b) => (b.compareTo(a) || statList.indexOf(a.statName) - statList.indexOf(b.statName)));
+        Object.defineProperty(target, "statFractions", {value: statFractions, configurable: true, enumerable: false, writable: false});
+        return statFractions;
+    }
+
     static {
         // listing these means they won't get stored even if memoized
-        Data.omitProperties(this.prototype, ["tooltip", "tooltip2", "label", "labelDone"]);
+        Data.omitProperties(this.prototype, ["tooltip", "tooltip2", "label", "labelDone", "statFractions"]);
     }
     
     // all actions to date with info text have the same info text, so presently this is

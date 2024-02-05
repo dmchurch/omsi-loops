@@ -799,7 +799,7 @@ class View {
             div.style.width = "100%";
             div.style.backgroundColor = "var(--cur-action-completed-background)";
         } else {
-            div.style.width = `${100 * action.ticks / action.adjustedTicks}%`;
+            div.style.width = `${100 * action.ticks / action.adjustedTicks.approximateValue}%`;
         }
 
         // only update tooltip if it's open
@@ -1164,39 +1164,39 @@ class View {
         let lockedSkills = "";
         const pieSlices = [];
         const gradientStops=[];
-        const statEntries = /** @type {[stat: StatName, ratio: number][]} */(Object.entries(action.stats));
+        const {statFractions} = action;
         // sort high to low, then by statname index
-        statEntries.sort(([aStat, aRatio], [bStat, bRatio]) => ((bRatio - aRatio) || (statList.indexOf(aStat) - statList.indexOf(bStat))));
-        let totalRatio = 0;
-        let gradientOffset = 0;
+        const totalFraction = new Rational();
+        const gradientOffset = new Rational();
         let lastArcPoint = [0, -1]; // start at 12 o'clock
-        for (const [stat, ratio] of statEntries) {
+        for (const fraction of statFractions) {
+            const stat = fraction.statName;
+            const ratio = fraction.approximateValue;
             const statLabel = _txt(`stats>${stat}>short_form`);
-            actionStats += `<dt class='stat-${stat}'>${statLabel}</dt> <dd class='stat-${stat}'>${ratio * 100}%</dd>`;
-            const startRatio = totalRatio;
-            totalRatio += ratio;
-            if (totalRatio >= 0.999 && totalRatio <= 1.001) totalRatio = 1;
-            const midRatio = (startRatio + totalRatio) / 2;
-            const angle = Math.PI * 2 * totalRatio;
+            actionStats += `<dt class='stat-${stat}'>${statLabel}</dt> <dd class='stat-${stat}'>${fraction.times(100)}%</dd>`;
+            const startRatio = totalFraction.clone();
+            totalFraction.add(fraction);
+            const midRatio = startRatio.plus(totalFraction).divideBy(2);
+            const angle = Math.PI * 2 * totalFraction.approximateValue;
             const arcPoint = [Math.sin(angle), -Math.cos(angle)];
             pieSlices.push(`<path class='pie-slice stat-${stat}' d='M0,0 L${lastArcPoint.join()} A1,1 0,${ratio >= 0.5 ? 1 : 0},1 ${arcPoint.join()} Z' />`);
             if (gradientStops.length === 0) {
-                gradientOffset = midRatio;
-                gradientStops.push(`from ${gradientOffset}turn`, `var(--stat-${stat}-color) calc(${gradientOffset}turn * var(--pie-ratio))`);
+                gradientOffset.copyFrom(midRatio);
+                gradientStops.push(`from ${gradientOffset.approximateValue}turn`, `var(--stat-${stat}-color) calc(${gradientOffset.approximateValue}turn * var(--pie-ratio))`);
             } else {
-                gradientStops.push(`var(--stat-${stat}-color) calc(${midRatio - gradientOffset}turn - (${ratio/2}turn * var(--pie-ratio))) calc(${midRatio - gradientOffset}turn + (${ratio/2}turn * var(--pie-ratio)))`);
+                gradientStops.push(`var(--stat-${stat}-color) calc(${midRatio.minus(gradientOffset).approximateValue}turn - (${ratio/2}turn * var(--pie-ratio))) calc(${midRatio.minus(gradientOffset).approximateValue}turn + (${ratio/2}turn * var(--pie-ratio)))`);
             }
             lastArcPoint = arcPoint;
         }
         // this is *almost* always true (but not always)
-        if (statEntries.length > 0) {
-            gradientStops.push(`var(--stat-${statEntries[0][0]}-color) calc(1turn - (${gradientOffset}turn * var(--pie-ratio)))`)
-            const highestRatio = statEntries[0][1];
-            lockedStats = `(${statEntries.map(([stat, ratio]) => /** @type {const} */([ratio === highestRatio, stat, _txt(`stats>${stat}>short_form`)]))
+        if (statFractions.length > 0) {
+            gradientStops.push(`var(--stat-${statFractions[0].statName}-color) calc(1turn - (${gradientOffset.approximateValue}turn * var(--pie-ratio)))`)
+            const highestFraction = statFractions[0];
+            lockedStats = `(${statFractions.map((fraction) => /** @type {const} */([fraction.equals(highestFraction), fraction.statName, _txt(`stats>${fraction.statName}>short_form`)]))
                                       .map(([isHighestStat, stat, label]) => `<span class='${isHighestStat?"bold":""} stat-${stat} stat-color'>${label}</span>`)
                                       .join(", ")})<br>`;
         }
-        const statPie = statEntries.length === 0 ? "" : `
+        const statPie = statFractions.length === 0 ? "" : `
                 <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-${action.varName}'>
                     <g id='stat-pie-${action.varName}-g'>
                         ${pieSlices.join("")}
