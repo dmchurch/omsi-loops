@@ -2054,7 +2054,7 @@ const Koviko = {
                 }
               }
             }
-            newStatisticValue = loop / totalMinutes;
+            newStatisticValue = state.resources.finLoops / totalMinutes;
             legend = finalAction.name;
           } else if (trackedStat.name=="survey") {
             newStatisticValue= getExploreSkill()* (state.resources.completedMap+3*state.resources.submittedMap)  / totalMinutes;
