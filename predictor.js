@@ -2350,52 +2350,63 @@ const Koviko = {
          * Progress of the tick
          * @type {number}
          */
-        let additionalProgress = tickProgress(segment) * (prediction.baseManaCost(prediction.action) / prediction.ticks());
-
-        // Accumulate the progress from the tick
-        progress += additionalProgress;
-        progression.progress += additionalProgress;
-
-        // Calculate the progress and current segment after the tick
-        while (progress >= progression.costList[segment] && progression.completed < maxSegments) {
-          progress -= progression.costList[segment++];
-          // Handle the completion of a loop
-          if (segment >= totalSegments) {
-            progression.progress = 0;
-            progression.completed += totalSegments;
-            progression.total++;
-            segment -= totalSegments;
-
-            // Apply the effect from the completion of a loop
-            if (prediction.loop.effect.loop) {
-              prediction.loop.effect.loop(state.resources, state.skills,state.soulstones,state.talents);
+	// Calculate how much mana is needed to complete a segment and only use that amount for the segment
+        var manaleft = 1
+        while (manaleft > 0) {
+            var additionalProgress = manaleft*tickProgress(segment) * (prediction.baseManaCost(prediction.action) / prediction.ticks());
+            if (additionalProgress > progression.costList[segment] - progress) {
+                manaleft -= manaleft*(progression.costList[segment]-progress ) / additionalProgress
+                additionalProgress = progression.costList[segment] - progress
             }
-
-            // Store remaining progress in next loop if next loop is allowed
-            if (progression.completed < maxSegments) {
-              progression.progress = progress;
-              //Helper for  caching cost Calculations
-              var loopTotalCost = 0;
-              //Helper for  caching cost Calculations
-              for (let i=0;i<totalSegments;i++) {
-                progression.costList[i]=loopCost(i);
-                loopTotalCost += loopCost(i);
+            else {
+                manaleft = 0
+            }
+            // Just to be safe
+            if (additionalProgress<=0) manaleft = 0;
+            // Accumulate the progress from the tick
+            progress += additionalProgress;
+            progression.progress += additionalProgress;
+    
+            // Calculate the progress and current segment after the tick
+            while (progress >= progression.costList[segment] && progression.completed < maxSegments) {
+              progress -= progression.costList[segment++];
+              // Handle the completion of a loop
+              if (segment >= totalSegments) {
+                progression.progress = 0;
+                progression.completed += totalSegments;
+                progression.total++;
+                segment -= totalSegments;
+    
+                // Apply the effect from the completion of a loop
+                if (prediction.loop.effect.loop) {
+                  prediction.loop.effect.loop(state.resources, state.skills,state.soulstones,state.talents);
+                }
+    
+                // Store remaining progress in next loop if next loop is allowed
+                if (progression.completed < maxSegments) {
+                  progression.progress = progress;
+                  //Helper for  caching cost Calculations
+                  var loopTotalCost = 0;
+                  //Helper for  caching cost Calculations
+                  for (let i=0;i<totalSegments;i++) {
+                    progression.costList[i]=loopCost(i);
+                    loopTotalCost += loopCost(i);
+                  }
+                  progression.loopTotalCost = loopTotalCost
+                }
               }
-              progression.loopTotalCost = loopTotalCost
+    
+              // Apply the effect from the completion of a segment
+              if (prediction.loop.effect.segment) {
+                prediction.loop.effect.segment(state.resources, state.skills);
+              }
             }
-          }
-
-          // Apply the effect from the completion of a segment
-          if (prediction.loop.effect.segment) {
-            prediction.loop.effect.segment(state.resources, state.skills);
-          }
         }
-
         return additionalProgress && segment < maxSegments;
       }
-
       return true;
     }
+
 
     /**
      * Perform all ticks of a prediction
