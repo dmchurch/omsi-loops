@@ -2044,8 +2044,18 @@ const Koviko = {
             newStatisticValue = (state.resources.expectedSS+state.resources.nonDungeonSS) / totalMinutes;
             legend="SS Expected";
           } else if (trackedStat.name=="act") {
-            newStatisticValue= loop / totalMinutes;
-            legend=actions[finalIndex].name;
+            let finalAction = actions[finalIndex];
+            if (finalAction.disabled) {
+              // Find the last non-disabled action
+              for (let i = finalIndex - 1; i >= 0; i--) {
+                if (!actions[i].disabled) {
+                  finalAction = actions[i];
+                  break;
+                }
+              }
+            }
+            newStatisticValue = state.resources.finLoops / totalMinutes;
+            legend = finalAction.name;
           } else if (trackedStat.name=="survey") {
             newStatisticValue= getExploreSkill()* (state.resources.completedMap+3*state.resources.submittedMap)  / totalMinutes;
             legend="Survey";
