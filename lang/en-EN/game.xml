@@ -14,8 +14,8 @@
             <b>Recent changes</b>
             ]]></version>
             -->
-            <version caption="Latest"><![CDATA[
-            <b>Recent changes</b>
+            <version verNum="3P.1.2"><![CDATA[
+            <b>Mar 23, 2025</b>
             • Fixed the first Wander action failing when fractional mana consumption is enabled in Extras.<br>
             • The two-column layout in the responsive UI now sets a minimum height for the Action List.<br>
             • Loadouts will no longer auto-save themselves when you change a loop counter. They weren't supposed to.<br>
