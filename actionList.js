@@ -661,7 +661,7 @@ function RuinsAction(townNum) {
         },
         affectedBy: ["SurveyZ1"],
         visible() {
-            return towns[this.townNum].getLevel("Survey") >= 100;
+            return towns[this.townNum].getLevel("Survey") >= 80;
         },
         unlocked() {
             return towns[this.townNum].getLevel("Survey") >= 100;
@@ -1458,6 +1458,9 @@ Action.HealTheSick = new MultipartAction("Heal The Sick", {
             case 5:
                 // fail reputation req
                 return storyFlags.failedHeal;
+            case 7:
+                return getSkillLevel("Restoration") >= 1;
+            //Yes, this is out of order, because Restoration>=1 was added later
             case 6:
                 return getSkillLevel("Restoration") >= 50;
         }
@@ -2262,7 +2265,7 @@ Action.LearnAlchemy = new Action("Learn Alchemy", {
         return Math.ceil(5000 * (1 - towns[1].getLevel("Hermit") * 0.005));
     },
     visible() {
-        return towns[1].getLevel("Hermit") >= 10;
+        return towns[1].getLevel("Hermit") >= 1;
     },
     unlocked() {
         return towns[1].getLevel("Hermit") >= 40 && getSkillLevel("Magic") >= 60;
@@ -2467,7 +2470,7 @@ Action.BirdWatching = new Action("Bird Watching", {
         return resources.glasses;
     },
     visible() {
-        return towns[1].getLevel("Flowers") >= 30;
+        return towns[1].getLevel("Flowers") >= 30 || towns[1].getLevel("Forest") >= 80;
     },
     unlocked() {
         return towns[1].getLevel("Flowers") >= 80;
@@ -3244,8 +3247,12 @@ Action.LargeDungeon = new DungeonAction("Large Dungeon", 1, {
         return 6000;
     },
     canStart(loopCounter = towns[this.townNum].LDungeonLoopCounter) {
+        if (resources.teamMembers < 1 && resources.zombie < 1)
+        {
+            return false;
+        }
         const curFloor = Math.floor((loopCounter) / this.segments + 0.0000001);
-        return resources.teamMembers >= 1 && curFloor < dungeons[this.dungeonNum].length;
+        return curFloor < dungeons[this.dungeonNum].length;
     },
     loopCost(segment, loopCounter = towns[this.townNum].LDungeonLoopCounter) {
         return precision3(Math.pow(3, Math.floor((loopCounter + segment) / this.segments + 0.0000001)) * 5e5);
@@ -5946,10 +5953,10 @@ Action.TheSpire = new DungeonAction("The Spire", 2, {
         if (curFloor == dungeonFloors[this.dungeonNum]-1) setStoryFlag("clearedSpire");
     },
     visible() {
-        return towns[5].getLevel("Meander") >= 5;
+        return towns[5].getLevel("Meander") >= 3;
     },
     unlocked() {
-        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
+        return towns[5].getLevel("Meander") >= 5;
     },
     finish() {
         handleSkillExp(this.skills);
@@ -7164,7 +7171,7 @@ Action.Seminar = new Action("Seminar", {
         addResource("gold", -1000);
     },
     visible() {
-        return towns[this.townNum].getLevel("Survey") >= 100;
+        return towns[this.townNum].getLevel("Survey") >= 80;
     },
     unlocked() {
         return towns[this.townNum].getLevel("Survey") >= 100;

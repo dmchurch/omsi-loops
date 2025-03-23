@@ -1609,7 +1609,8 @@
             <label>Ruins</label>
             <label_done>Delved</label_done>
             <tooltip><![CDATA[
-            As you explore, you find ruins scattered among the trees. You better explore them, who knows what useful secrets they hide.
+            As you explore, you find ruins scattered among the trees. You better explore them, who knows what useful secrets they hide.<br>
+            Requires surveying 100% of the zone.
             ]]></tooltip>
             <story_1><![CDATA[<b>10% delved:</b>⮀ You decide to explore the ruins in the Forest and notice some weird looking rocks, wondering idly what they do.]]></story_1>
             <story_2><![CDATA[<b>50% delved:</b>⮀ After investigating these weird looking rocks you notice they are cubical and are heavy, looks like they are dusty from the time they have been sitting here.]]></story_2>
@@ -1619,7 +1620,8 @@
             <label>Ruins</label>
             <label_done>Delved</label_done>
             <tooltip><![CDATA[
-            As you explore, you find ruins scattered around the Mountain. You better explore them, who knows what useful secrets they hide.
+            As you explore, you find ruins scattered around the Mountain. You better explore them, who knows what useful secrets they hide.<br>
+            Requires surveying 100% of the zone.
             ]]></tooltip>
             <story_1><![CDATA[<b>10% delved:</b>⮀ You decide to explore the ruins around Mt. Olympus and notice the same cubical rocks as you found in the forest. You wonder what they were made for.]]></story_1>
             <story_2><![CDATA[<b>50% delved:</b>⮀ There is a stone with some writing, with your high intelligence you might be able to read this strange language.]]></story_2>
@@ -1629,7 +1631,8 @@
             <label>Ruins</label>
             <label_done>Delved</label_done>
             <tooltip><![CDATA[
-            As you explore, you find ruins scattered around the shadowy village. You better explore them, who knows what useful secrets they hide.
+            As you explore, you find ruins scattered around the shadowy village. You better explore them, who knows what useful secrets they hide.<br>
+            Requires surveying 100% of the zone.
             ]]></tooltip>
             <story_1><![CDATA[<b>10% delved:</b>⮀ You decide to explore the ruins of Startington and notice the same dusty cubical rocks as you found in the other ruins. You wonder what they do.]]></story_1>
             <story_2><![CDATA[<b>50% delved:</b>⮀ After deciphering the text on this stone block, You can see some writing on them. Sadly, much of the writing is too eroded to make out.]]></story_2>
@@ -1639,7 +1642,8 @@
             <label>Ruins</label>
             <label_done>Delved</label_done>
             <tooltip><![CDATA[
-            As you explore, you find ruins scattered around the dense jungle. You better explore them, who knows what useful secrets they hide.
+            As you explore, you find ruins scattered around the dense jungle. You better explore them, who knows what useful secrets they hide.<br>
+            Requires surveying 100% of the zone.
             ]]></tooltip>
             <story_1><![CDATA[<b>10% delved:</b>⮀ You decide to explore the ruins along the Jungle Path and notice yet again more of the same dusty and heavy cubical rocks. The mystery of the rocks endures...]]></story_1>
             <story_2><![CDATA[<b>50% delved:</b>⮀ During your ruin exploration, you find a weapon. Ancient, heavy and ornate. It takes some thinking, but you eventually recall a legend of a God wielding this particular weapon into battle.]]></story_2>
@@ -1908,7 +1912,8 @@
 			<story_3><![CDATA[<b>100 Patients healed:</b>⮀ You've healed some of these townsfolk so many times, you don't actually need to speak to them or examine them to find out what's wrong. You go through the same steps anyways, because good bedside manners are an integral part of earning respect as a healer.]]></story_3>
 			<story_4><![CDATA[<b>1000 Patients healed:</b>⮀ You never formally trained as a healer, but you've healed so many people that you're pretty much an expert now. Nothing can stop you, nothing can stump you, nothing can even slow you down! ...Except when they bring in a patient you haven't seen before. When that happens, it usually takes you a while to figure out what their problem is.]]></story_4>
 			<story_5><![CDATA[<b>Failed Action:</b>⮀ You're turned away at the door, the small healers home stating that they can't trust you to not poison the people inside or make the situation worse.]]></story_5>
-			<story_6><![CDATA[<b>50 Restoration:</b>⮀ You'd say it's like magic, but you were already using magic so instead it's like double-magic. The medics can't tell what you're doing, it's completely outside their paradigm: you simply touch the patient's forehead and, with a surge of energy, they're healed. You don't do it to boast, though. All you want is to help.]]></story_6>
+			<story_7><![CDATA[<b>1 Restoration:</b>⮀ You really want to try out your new Restoration magic, but so far your instructors back in Valhalla haven't let you it on a person yet.  Sure, any victems, err, paitents would be restored to their usual imperfect health at the end of the loop, but maybe a little more practice first wouldn't hurt either.]]></story_7>
+            <story_6><![CDATA[<b>50 Restoration:</b>⮀ You'd say it's like magic, but you were already using magic so instead it's like double-magic. The medics can't tell what you're doing, it's completely outside their paradigm: you simply touch the patient's forehead and, with a surge of energy, they're healed. You don't do it to boast, though. All you want is to help.]]></story_6>
 			<segment_names>
 				<name>Diagnose</name>
 				<name>Treat</name>
