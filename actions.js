@@ -84,7 +84,14 @@ class Actions {
         availableMana ??= 1;
         availableMana = Mana.floor(availableMana);
 
+        //This will still mean the mana is a tick behind, but at least it's accurate, and if the player needs to
+        //see remaining mana in the current tick, they can look at the top of the screen.
+        //Unfortunately this function operates off undilated time, so it can't actually know how much
+        //mana it'll use.
+        this.current[this.currentPos].manaRemaining = timeNeeded - timer;
+
         const curAction = this.getNextValidAction();
+
         // out of actions
         if (!curAction) {
             shouldRestart = true;
@@ -174,7 +181,6 @@ class Actions {
                             view.requestUpdate("updateTotalTicks", null);
                             curAction.loopsLeft = 0;
                             curAction.ticks = 0;
-                            curAction.manaRemaining = timeNeeded - timer;
                             curAction.goldRemaining = resources.gold;
                             curAction.finish();
                             totals.actions++;
@@ -214,7 +220,6 @@ class Actions {
             this.completedTicks += curAction.adjustedTicks;
             curAction.finish();
             totals.actions++;
-            curAction.manaRemaining = timeNeeded - timer;
             
             if (curAction.cost) {
                 curAction.cost();
