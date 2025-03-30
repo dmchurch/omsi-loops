@@ -4696,7 +4696,7 @@ Action.AcceptDonations = new Action("Accept Donations", {
             case 2: return towns[4][`good${this.varName}`] >= 1;
             case 3: return towns[4][`good${this.varName}`] >= 100;
             case 4: return towns[4][`good${this.varName}`] >= 250;
-            case 5: return storyFlags.failedReceivedDonations;
+            case 5: return storyFlags.failedReceivedDonation;
         }
     },
     stats: {
