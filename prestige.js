@@ -125,6 +125,14 @@ function prestigeWithNewValues(nextPrestigeValues, nextPrestigeBuffs) {
 
 function prestigeConfirmation() {
     save();
+
+    if (totals.actions === 0)
+    {
+        //This helps prevent repeated confirmations, and blowing away your backup when picking a second ability.
+        //If you have no actions, then there's nothing worth protecting.
+        return true;
+    }
+
     if (window.localStorage[defaultSaveName] && window.localStorage[defaultSaveName] !== "") {
         if (confirm(`Prestiging will reset all of your progress, but retain prestige points. Are you sure?`)) {
             for (const town of towns) {

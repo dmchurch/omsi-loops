@@ -20,6 +20,9 @@
             • The two-column layout in the responsive UI now sets a minimum height for the Action List.<br>
             • Loadouts will no longer auto-save themselves when you change a loop counter. They weren't supposed to.<br>
             • Fixed a long-standing bug that would cause travel actions to fail when you remove the portal from the action list (the PORTAL MISSING bug).<br>
+            • A great many bugfixes provided by Guri on the Discord! Action stories should unlock much more reliably. In addition:<br>
+            • The effects of Mercantilism should show up more reliably in tooltips.<br>
+            • Prestige will no longer request confirmation if you're resetting at the beginning of a prestige run.<br>
             ]]></version>
             <version verNum="3P.1.1"><![CDATA[
             <b>Mar 1st, 2024</b>
@@ -1228,7 +1231,7 @@
         <spatiomancy>
             <label>Spatiomancy</label>
             <desc>Who knew bending reality to your will could be so useful!</desc>
-            <desc2><![CDATA[Mana Geyser and Mana Well are reduced to the original / (1 + level / 100).<br>
+            <desc2><![CDATA[The mana costs for the Mana Geyser and Mana Well actions are reduced to the original / (1 + level / 100).<br>
             Houses to build increased by 1% per level from 1 - 500.<br>
             The following actions are increased by 0.5% per level in their level range.<br>
             101-300 Locked houses<br>
@@ -3268,8 +3271,8 @@
             <label>Open Portal</label>
             <tooltip><![CDATA[
             The Explorers' guild tells you of a secret grove within the Jungle, where the barrier between realms is weakest. With enough restoration skill, you might be able to open a rift back and leave the shadow realm. However, it seems quite a bit of time passes in the portal, and some merchants have closed up shop.<br>
-            Unlocked with 75% of the world surveyed.<br>
-            Travels to Forest Path.<br>Buy Mana actions can not be used for the rest of the current loop.<br>Requires 1000 Restoration.
+            Unlocked with 75% of the world surveyed, and 1000 Restoration.<br>
+            Travels to Forest Path.<br>Buy Mana actions can not be used for the rest of the current loop.
             ]]></tooltip>
             <story_1><![CDATA[<b>Portal opened:</b>⮀ Despite the Veil being thin in this place, you still have to push quite a bit to get through. Whether it is due to the Gods trying to keep the Shadow Realm from invading or the simple physics of inter-realm travel, you can feel the hunger from the Jungle grow quiet as you approach the rippling portal you just created and step through to the forest on the other side. Looking at the sky, you're surprised to find that night is falling now!]]></story_1>
         </open_portal>

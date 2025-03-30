@@ -3110,14 +3110,14 @@ Action.AdventureGuild = new MultipartAction("Adventure Guild", {
                 Math.sqrt(1 + totalCompletions / 1000);
     },
     loopsFinished() {
-        if (curAdvGuildSegment >= 0) setStoryFlag("advGuildRankEReached");
-        if (curAdvGuildSegment >= 3) setStoryFlag("advGuildRankDReached");
-        if (curAdvGuildSegment >= 6) setStoryFlag("advGuildRankCReached");
-        if (curAdvGuildSegment >= 9) setStoryFlag("advGuildRankBReached");
-        if (curAdvGuildSegment >= 12) setStoryFlag("advGuildRankAReached");
-        if (curAdvGuildSegment >= 15) setStoryFlag("advGuildRankSReached");
-        if (curAdvGuildSegment >= 27) setStoryFlag("advGuildRankUReached");
-        if (curAdvGuildSegment >= 39) setStoryFlag("advGuildRankGodlikeReached");
+        if (curAdvGuildSegment >= 3) setStoryFlag("advGuildRankEReached");
+        if (curAdvGuildSegment >= 6) setStoryFlag("advGuildRankDReached");
+        if (curAdvGuildSegment >= 9) setStoryFlag("advGuildRankCReached");
+        if (curAdvGuildSegment >= 12) setStoryFlag("advGuildRankBReached");
+        if (curAdvGuildSegment >= 15) setStoryFlag("advGuildRankAReached");
+        if (curAdvGuildSegment >= 18) setStoryFlag("advGuildRankSReached");
+        if (curAdvGuildSegment >= 30) setStoryFlag("advGuildRankUReached");
+        if (curAdvGuildSegment >= 42) setStoryFlag("advGuildRankGodlikeReached");
     },
     segmentFinished() {
         curAdvGuildSegment++;
@@ -3327,14 +3327,14 @@ Action.CraftingGuild = new MultipartAction("Crafting Guild", {
                 Math.sqrt(1 + totalCompletions / 1000);
     },
     loopsFinished() {
-        if (curCraftGuildSegment >= 0) setStoryFlag("craftGuildRankEReached");
-        if (curCraftGuildSegment >= 3) setStoryFlag("craftGuildRankDReached");
-        if (curCraftGuildSegment >= 6) setStoryFlag("craftGuildRankCReached");
-        if (curCraftGuildSegment >= 9) setStoryFlag("craftGuildRankBReached");
-        if (curCraftGuildSegment >= 12) setStoryFlag("craftGuildRankAReached");
-        if (curCraftGuildSegment >= 15) setStoryFlag("craftGuildRankSReached");
-        if (curCraftGuildSegment >= 27) setStoryFlag("craftGuildRankUReached");
-        if (curCraftGuildSegment >= 39) setStoryFlag("craftGuildRankGodlikeReached");
+        if (curCraftGuildSegment >= 3) setStoryFlag("craftGuildRankEReached");
+        if (curCraftGuildSegment >= 6) setStoryFlag("craftGuildRankDReached");
+        if (curCraftGuildSegment >= 9) setStoryFlag("craftGuildRankCReached");
+        if (curCraftGuildSegment >= 12) setStoryFlag("craftGuildRankBReached");
+        if (curCraftGuildSegment >= 15) setStoryFlag("craftGuildRankAReached");
+        if (curCraftGuildSegment >= 18) setStoryFlag("craftGuildRankSReached");
+        if (curCraftGuildSegment >= 30) setStoryFlag("craftGuildRankUReached");
+        if (curCraftGuildSegment >= 42) setStoryFlag("craftGuildRankGodlikeReached");
     },
     segmentFinished() {
         curCraftGuildSegment++;
@@ -4934,9 +4934,8 @@ Action.Mercantilism = new Action("Mercantilism", {
     },
     finish() {
         handleSkillExp(this.skills);
-        view.requestUpdate("adjustManaCost", "Buy Mana Z1");
-        view.requestUpdate("adjustManaCost", "Buy Mana Z3");
-        view.requestUpdate("adjustManaCost", "Buy Mana Z5");
+        //Needed for Mercantilism levelup
+        view.requestUpdate("adjustGoldCosts");
     },
 });
 
@@ -5475,16 +5474,16 @@ Action.FightFrostGiants = new MultipartAction("Fight Frost Giants", {
     },
     segmentFinished() {
         curFightFrostGiantsSegment++;
-        if (curFightFrostGiantsSegment >= 6) setStoryFlag("giantGuildRankEReached");
-        if (curFightFrostGiantsSegment >= 12) setStoryFlag("giantGuildRankDReached");
-        if (curFightFrostGiantsSegment >= 18) setStoryFlag("giantGuildRankCReached");
-        if (curFightFrostGiantsSegment >= 24) setStoryFlag("giantGuildRankBReached");
-        if (curFightFrostGiantsSegment >= 30) setStoryFlag("giantGuildRankAReached");
-        if (curFightFrostGiantsSegment >= 36) setStoryFlag("giantGuildRankSReached");
-        if (curFightFrostGiantsSegment >= 42) setStoryFlag("giantGuildRankSSReached");
-        if (curFightFrostGiantsSegment >= 48) setStoryFlag("giantGuildRankSSSReached");
-        if (curFightFrostGiantsSegment >= 54) setStoryFlag("giantGuildRankUReached");
-        if (curFightFrostGiantsSegment >= 60) setStoryFlag("giantGuildRankGodlikeReached");
+        if (curFightFrostGiantsSegment >= 3) setStoryFlag("giantGuildRankEReached");
+        if (curFightFrostGiantsSegment >= 9) setStoryFlag("giantGuildRankDReached");
+        if (curFightFrostGiantsSegment >= 15) setStoryFlag("giantGuildRankCReached");
+        if (curFightFrostGiantsSegment >= 21) setStoryFlag("giantGuildRankBReached");
+        if (curFightFrostGiantsSegment >= 27) setStoryFlag("giantGuildRankAReached");
+        if (curFightFrostGiantsSegment >= 33) setStoryFlag("giantGuildRankSReached");
+        if (curFightFrostGiantsSegment >= 39) setStoryFlag("giantGuildRankSSReached");
+        if (curFightFrostGiantsSegment >= 45) setStoryFlag("giantGuildRankSSSReached");
+        if (curFightFrostGiantsSegment >= 51) setStoryFlag("giantGuildRankUReached");
+        if (curFightFrostGiantsSegment >= 57) setStoryFlag("giantGuildRankGodlikeReached");
     },
     getPartName() {
         return `${getFrostGiantsRank().name}`;
@@ -5635,6 +5634,7 @@ Action.GreatFeast = new MultipartAction("Great Feast", {
         return Math.ceil(5000 * (getBuffLevel("Feast") + 1) * getSkillBonus("Gluttony"));
     },
     finish() {
+        setStoryFlag("feastAttempted")
         view.requestUpdate("updateBuff", "Feast");
     },
 });
@@ -6182,15 +6182,15 @@ Action.FightJungleMonsters = new MultipartAction("Fight Jungle Monsters", {
         //I.e., the sloth fight is segments 6, 7 and 8, so the unlock
         //happens when the 8th segment is done and the current segment
         //is 9 or more.
-        if (curFightJungleMonstersSegment > 8) setStoryFlag("monsterGuildRankDReached");
-        if (curFightJungleMonstersSegment > 14) setStoryFlag("monsterGuildRankCReached");
-        if (curFightJungleMonstersSegment > 20) setStoryFlag("monsterGuildRankBReached");
-        if (curFightJungleMonstersSegment > 26) setStoryFlag("monsterGuildRankAReached");
-        if (curFightJungleMonstersSegment > 32) setStoryFlag("monsterGuildRankSReached");
-        if (curFightJungleMonstersSegment > 38) setStoryFlag("monsterGuildRankSSReached");
-        if (curFightJungleMonstersSegment > 44) setStoryFlag("monsterGuildRankSSSReached");
-        if (curFightJungleMonstersSegment > 50) setStoryFlag("monsterGuildRankUReached");
-        if (curFightJungleMonstersSegment > 56) setStoryFlag("monsterGuildRankGodlikeReached");
+        if (curFightJungleMonstersSegment >= 9) setStoryFlag("monsterGuildRankDReached");
+        if (curFightJungleMonstersSegment >= 15) setStoryFlag("monsterGuildRankCReached");
+        if (curFightJungleMonstersSegment >= 21) setStoryFlag("monsterGuildRankBReached");
+        if (curFightJungleMonstersSegment >= 27) setStoryFlag("monsterGuildRankAReached");
+        if (curFightJungleMonstersSegment >= 33) setStoryFlag("monsterGuildRankSReached");
+        if (curFightJungleMonstersSegment >= 39) setStoryFlag("monsterGuildRankSSReached");
+        if (curFightJungleMonstersSegment >= 45) setStoryFlag("monsterGuildRankSSSReached");
+        if (curFightJungleMonstersSegment >= 51) setStoryFlag("monsterGuildRankUReached");
+        if (curFightJungleMonstersSegment >= 57) setStoryFlag("monsterGuildRankGodlikeReached");
         // Additional thing?
     },
     getPartName() {
@@ -6284,8 +6284,8 @@ Action.RescueSurvivors = new MultipartAction("Rescue Survivors", {
     loopsFinished(loopCounter = towns[6].RescueLoopCounter) {
         addResource("reputation", 4);
         setStoryFlag("survivorRescued");
-        if (loopCounter >= 6) setStoryFlag("rescued6Survivors");
-        if (loopCounter >= 20) setStoryFlag("rescued20Survivors");
+        if (loopCounter >= 6*3) setStoryFlag("rescued6Survivors");
+        if (loopCounter >= 20*3) setStoryFlag("rescued20Survivors");
     },
     getPartName(loopCounter = towns[6].RescueLoopCounter) {
         return `${_txt(`actions>${getXMLName(this.name)}>label_part`)} ${numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))}`;
@@ -6426,6 +6426,8 @@ Action.Escape = new Action("Escape", {
         unlockTown(7);
     },
     story(completed) {
+        //FIXME: This will (unfortunately) give the story completion for creating the looping potion, even
+        //if the player didn't, because completing story N will also complete all stories less than N.
         unlockGlobalStory(10);
     },
 });
@@ -6457,7 +6459,7 @@ Action.OpenPortal = new Action("Open Portal", {
         return getExploreProgress() > 50;
     },
     unlocked() {
-        return getExploreProgress() >= 75;
+        return getExploreProgress() >= 75 && getSkillLevel("Restoration") >= 1000;
     },
     canStart() {
         return getSkillLevel("Restoration") >= 1000;
@@ -7063,9 +7065,19 @@ Action.Invest = new Action("Invest", {
     },
     finish() {
         handleSkillExp(this.skills);
-        goldInvested += resources.gold;
-        if (goldInvested > 999999999999) goldInvested = 999999999999;
-        resetResource("gold");
+        //Needed for Mercantilism levelup
+        view.requestUpdate("adjustGoldCosts");
+
+        //Looks like something (maybe very high accelerations?) can give you a gold value of NaN.  If so, don't corrupt
+        //the save file
+        if (isFinite(resources.gold))
+        {
+            goldInvested += resources.gold;
+            if (goldInvested > 999999999999) goldInvested = 999999999999;
+
+            //Don't reset the gold value if it's NaN.  This should make it a bit easier to see what went wrong.
+            resetResource("gold");
+        }
         if (storyFlags.investedOne) setStoryFlag("investedTwo");
         setStoryFlag("investedOne");
         view.requestUpdate("updateActionTooltips", null);
@@ -7109,6 +7121,9 @@ Action.CollectInterest = new Action("Collect Interest", {
     },
     finish() {
         handleSkillExp(this.skills);
+        //Needed for Mercantilism levelup
+        view.requestUpdate("adjustGoldCosts");
+
         let interestGold = Math.floor(goldInvested * .001);
         addResource("gold", interestGold);
         setStoryFlag("interestCollected");
@@ -7318,11 +7333,14 @@ Action.ImbueSoul = new MultipartAction("Imbue Soul", {
     storyReqs(storyNum) {
         switch(storyNum) {
             case 1: return storyFlags.soulInfusionAttempted;
-            case 2: return buffs["Imbuement3"].amt > 0;
-            case 3: return buffs["Imbuement3"].amt > 6;
-            case 4: return buffs["Imbuement"].amt > 499
-                        && buffs["Imbuement2"].amt > 499
-                        && buffs["Imbuement3"].amt > 6;
+            //Protect these with a check for soulInfusionAttempted, so they don't "finish" instantly
+            //on prestige.
+            case 2: return storyFlags.soulInfusionAttempted && buffs["Imbuement3"].amt > 0;
+            case 3: return storyFlags.soulInfusionAttempted && buffs["Imbuement3"].amt > 6;
+            case 4: return storyFlags.soulInfusionAttempted &&
+                        buffs["Imbuement"].amt > 499 &&
+                        buffs["Imbuement2"].amt > 499 &&
+                        buffs["Imbuement3"].amt > 6;
         }
     },
     stats: {
@@ -7369,6 +7387,7 @@ Action.ImbueSoul = new MultipartAction("Imbue Soul", {
         return getBuffLevel("Imbuement") > 499 && getBuffLevel("Imbuement2") > 499;
     },
     finish() {
+        setStoryFlag("soulInfusionAttempted")
         view.requestUpdate("updateBuff", "Imbuement3");
         capAllTraining();
         adjustTrainingExpMult();

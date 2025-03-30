@@ -154,6 +154,10 @@ class Actions {
                 while (curProgress >= loopCost(segment)) {
                     curProgress -= loopCost(segment);
                     // segment finished
+                    if (curAction.segmentFinished) {
+                        curAction.segmentFinished();
+                        partUpdateRequired = true;
+                    }
                     if (segment === curAction.segments - 1) {
                         // part finished
                         if (curAction.name === "Dark Ritual" && towns[curAction.townNum][curAction.varName] >= 4000000) setStoryFlag("darkRitualThirdSegmentReached");
@@ -177,10 +181,6 @@ class Actions {
                             break manaLoop;
                         }
                         towns[curAction.townNum][curAction.varName] = curProgress;
-                    }
-                    if (curAction.segmentFinished) {
-                        curAction.segmentFinished();
-                        partUpdateRequired = true;
                     }
                     segment++;
                     manaLeftForCurrentSegment = Math.min(manaLeft, getMaxTicksForStat(curAction, curAction.loopStats[segment], false));
@@ -728,7 +728,13 @@ function markActionsComplete(loopCompletedActions) {
 function actionStory(loopCompletedActions) {
     loopCompletedActions.forEach(action => {
         let completed = action.loops - action.loopsLeft;
-        if (action.story !== undefined) action.story(completed);
+        //Test for completed, because all of the actions in .story(completed) assume it was successfully
+        //completed.  Without this we advance the story by putting an action in the list rather than
+        // completing it.  We should really have a hook for failure as well.
+        if (completed > 0 && action.story !== undefined)
+        {
+            action.story(completed);
+        }
     });
 }
 
