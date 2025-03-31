@@ -239,7 +239,11 @@ class Skill extends Localizable {
     name;
     levelExp = new LevelExp();
     /** @type {Skill_increase | Skill_decrease | Skill_custom | 0} */
-    change = 0;
+    change = 0; //I think now it isn't used any more, now that I removed it's use?
+    multiplier = 1; //Multiplier used for the bonus calculation on skills.
+    exponent = 1; //Exponent used for the bonus calculation on skills. //If the exponent is negative, it makes it so it is 1/ the calculation, instead of just the calculation. So instead of X, 1/X.
+    addition = 1; //The ammount added. 1 by default, only needs to be changed if it isn't 1.
+    //You can find all two are used in the getBonus() function.
 
     /** @param {SkillName} name */
     constructor(name) {
@@ -280,12 +284,19 @@ class Skill extends Localizable {
     #bonusCalc;
     /** @type {number} */
     #bonus;
+    //getBonus() {
+    //    if (this.#bonusCalc !== this.levelExp.level) {
+    //        this.#bonus = (this.change === Skill_increase) ? Math.pow(1 + this.levelExp.level / 60, 0.25)
+    //                    : (this.change === Skill_decrease) ? 1 / (1 + this.levelExp.level / 100)
+    //                    : (this.change === Skill_custom) ? 1 / (1 + this.levelExp.level / 2000)
+    //                    : 0;
+    //        this.#bonusCalc = this.levelExp.level;
+    //    }
+    //    return this.#bonus;
+    //}
     getBonus() {
         if (this.#bonusCalc !== this.levelExp.level) {
-            this.#bonus = (this.change === Skill_increase) ? Math.pow(1 + this.levelExp.level / 60, 0.25)
-                        : (this.change === Skill_decrease) ? 1 / (1 + this.levelExp.level / 100)
-                        : (this.change === Skill_custom) ? 1 / (1 + this.levelExp.level / 2000)
-                        : 0;
+            this.#bonus = Math.pow(this.addition + this.levelExp.level * this.multiplier, this.exponent);
             this.#bonusCalc = this.levelExp.level;
         }
         return this.#bonus;
@@ -444,14 +455,41 @@ function getSkillBonus(skill) {
 /** @param {SkillName} skill */
 function setSkillBonusType(skill) {
     let change;
-    if (skill === "Dark" || skill === "Chronomancy" || skill === "Mercantilism" || skill === "Divine" || skill === "Wunderkind" || skill === "Thievery" || skill === "Leadership") change = "increase";
-    else if (skill === "Practical" || skill === "Spatiomancy" || skill === "Commune" || skill === "Gluttony") change = "decrease";
-    else if (skill === "Assassin") change = "custom";
+    let multiplier;
+    let exponent;
+    let addition;
+    if (skill === "Dark" || skill === "Mercantilism" || skill === "Divine" || skill === "Wunderkind" || skill === "Thievery" || skill === "Leadership") {
+    multiplier = 1/60;
+    exponent = 0.5;
+    }
+    else if (skill === "Chronomancy") {
+        multiplier = 1/60;
+        exponent = 0.25;
+    }
+    else if (skill === "Practical" || skill === "Spatiomancy" || skill === "Commune" || skill === "Gluttony") {
+        multiplier = 1/100;
+        exponent = -1;
+    }
+    else if (skill === "Assassin") {
+        multiplier = 1/2000;
+        exponent = -1;
+    }
+    else if (skill === "Alchemy") {
+        multiplier = 49;
+        exponent = 0.5;
+        addition = 0;
+    }
+    //If you want to make your own skill, you can include it one one of the above calculations, or if you want to give it a custom formula, then copy the line below whilst replacing the placeholders.
+    //else if (skill === "The_name_of_your_skill") multiplier = What you wish to multiply or divide your skill by, if it's divide, put 1/x, x being the divider number && exponent = What you wish to raise your number to, above 1 for big, below 1 for roots, and negatives for the same but inversing ;
+    
+    skills[skill].multiplier = multiplier;
+    skills[skill].exponent = exponent;
+    skills[skill].addition = addition;
 
-    if(change == "increase") skills[skill].change = Skill_increase;
-    else if (change == "decrease") skills[skill].change = Skill_decrease;
-    else if (change == "custom") skills[skill].change = Skill_custom;
-    else return skills[skill].change = 0;
+    //if(change == "increase") skills[skill].change = Skill_increase;
+    //else if (change == "decrease") skills[skill].change = Skill_decrease;
+    //else if (change == "custom") skills[skill].change = Skill_custom;
+    //else return skills[skill].change = 0;
 }
 
 /** @param {SkillName} name */
