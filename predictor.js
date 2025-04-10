@@ -929,8 +929,8 @@ const Koviko = {
         'Gather Team':{ affected:['team','gold'],
           canStart:(input) => ((input.guild=='adventure')&&(input.gold>=(input.team+1) * 100)),
           effect:(r) => (r.team = (r.team || 0) + 1, r.gold -= r.team * 100)},
-        'Large Dungeon':{ affected:['team','soul'],
-          canStart:(input) => (input.team>0), loop: {
+        'Large Dungeon':{ affected:['team','soul','zombie'],
+          canStart:(input) => (input.team>0 || input.zombie>0), loop: {
           max:(a) =>  dungeons[a.dungeonNum].length,
           cost:(p, a) => segment =>  precision3(Math.pow(3, Math.floor((p.completed + segment) / a.segments + .0000001)) * 5e5),
           tick:(p, a, s, k, r) => offset => {

@@ -3224,6 +3224,8 @@ Action.LargeDungeon = new DungeonAction("Large Dungeon", 1, {
                 return towns[2][`total${this.varName}`] >= 20000;
             case 5:
                 return storyFlags.clearLDungeon;
+            case 6:
+            return storyFlags.largeDungeonAttempted && storyVars.maxZombiesRaised >= 1;
         }
         return false;
     },
@@ -3245,7 +3247,7 @@ Action.LargeDungeon = new DungeonAction("Large Dungeon", 1, {
     },
     canStart(loopCounter = towns[this.townNum].LDungeonLoopCounter) {
         const curFloor = Math.floor((loopCounter) / this.segments + 0.0000001);
-        return resources.teamMembers >= 1 && curFloor < dungeons[this.dungeonNum].length;
+        return (resources.teamMembers >= 1 || resources.zombie >= 1) && curFloor < dungeons[this.dungeonNum].length;
     },
     loopCost(segment, loopCounter = towns[this.townNum].LDungeonLoopCounter) {
         return precision3(Math.pow(3, Math.floor((loopCounter + segment) / this.segments + 0.0000001)) * 5e5);
