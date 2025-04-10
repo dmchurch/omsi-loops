@@ -2436,6 +2436,7 @@
 			<story_3><![CDATA[<b>10,000 Dungeon Floors Looted:</b>⮀ While the dungeon is never quite the same, you have its measure, and that lets you persuade your party to go down the right corridors and avoid traps. You can tell they're suspicious, but you shrug it off as some kind of intuition and change the topic before an argument can start.]]></story_3>
 			<story_4><![CDATA[<b>20,000 Dungeon Floors Looted:</b>⮀ They probably don't realize how much you're pulling the strings. How many arguments you've stopped before they start, or why they've never once made a wrong turn. At this point you know them better than they know themselves, and adventuring has never been so peaceful.]]></story_4>
 			<story_5><![CDATA[<b>9 Floors cleared in a loop:</b>⮀ An ornate altar in a room full of carvings holds the final soulstones of the dungeon. It emanates a deep red tinted with gray and you feel slightly unsettled, but soulstones are soulstones. You pocket them and swiftly leave.]]></story_5>
+			<story_6><![CDATA[<b>Zombie raised:</b>⮀ You just got a wicked idea; why, instead of paying adventurers with gold, you paid your own undead followers with blood? They may be a bit slower, but they certainly can serve as meat shields or to help disarm traps with enough intructions given. Best part? They don't argue about loot.]]></story_6>
         </large_dungeon>
         <crafting_guild>
             <label>Crafting Guild</label>
