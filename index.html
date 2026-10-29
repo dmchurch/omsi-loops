@@ -53,42 +53,42 @@
     <div id="talentTree" style="display: none;"></div>
     <header id="timeInfo" style="width:100%;text-align:center;">
         <button id="cheat" class="button showthat control" style="display: none; margin-top: 5px;" onclick="cheat()">Cheat</button>
-        <div id="timeBarContainer" style="width:100%;height:10px;background:var(--progress-bar-background);text-align:center;position:relative;">
-            <div id="timeBar" style="height:100%;width:20%;background-color:var(--progress-bar-mana-color);display:block;margin:auto;"></div>
+        <div role="none" id="timeBarContainer" style="width:100%;height:10px;background:var(--progress-bar-background);text-align:center;position:relative;">
+            <div role="progressbar" aria-label="Mana remaining" id="timeBar" style="height:100%;width:20%;background-color:var(--progress-bar-mana-color);display:block;margin:auto;"></div>
         </div>
-        <menu id='menu' style='float: left; height: 30px; margin-left: 24px; margin-right: -24px;'></menu>
-        <div id='trackedResources'></div>
+        <menu role="menubar" aria-label="Main menu" id='menu' style='float: left; height: 30px; margin-left: 24px; margin-right: -24px;'></menu>
+        <div role="list" aria-live="polite" aria-atomic="false" aria-label="Tracked resources" id='trackedResources'></div>
         <br>
-        <div id='timeControls'></div>
+        <div role="toolbar" aria-label="Playback controls" id='timeControls'></div>
     </header>
 
     <main id="main">
-        <div id="statsColumn">
+        <div role="none" id="statsColumn">
             <!-- The stat view starts out in radar mode so that init() can get text lengths -->
-            <div id="statsWindow" data-view="radar">
-                <div id="statsTitle" class="showthat block">
+            <section id="statsWindow" aria-labelledby="statsTitle" data-view="radar">
+                <div role="heading" aria-describedby="statsWindowTooltip" id="statsTitle" class="showthat block">
                     <div class="large bold localized" data-lockey="stats>title"></div>
-                    <div class="showthis localized" data-lockey="stats>tooltip>explanation" style="width:550px;"></div>
+                    <div role="tooltip" id="statsWindowTooltip" class="showthis localized" data-lockey="stats>tooltip>explanation" style="width:550px;"></div>
                 </div>
-                <div id="statViewSelector" class="block">
+                <div role="tablist" id="statViewSelector" class="block">
                     <input type="radio" id="regularStats" name="statView" onclick="view.changeStatView()" checked />
                     <label for="regularStats" class="localized" data-lockey="stats>view>regular"></label>
                     <input type="radio" id="radarStats" name="statView" onclick="view.changeStatView()" />
                     <label for="radarStats" class="localized" data-lockey="stats>view>radar"></label>
                 </div>
-                <div class="showthat block" id="radarChart">
+                <div role="tabpanel" class="showthat block" id="radarChart">
                     <svg id="statChart" class="radar-chart" viewBox="-200 -200 400 400" preserveAspectRatio="xMidYMin meet"></svg>
                     <div class="showthis localized" style="margin-top:20px;width:375px" data-lockey="stats>tooltip>graph_legend"></div>
                 </div>
-                <div id="statsContainer">
-                    <div class='statContainer stat-total showthat' id="totalStatContainer">
-                        <div class='statLabelContainer'>
-                            <div class='medium bold stat-name localized' style='margin-left:18px;margin-top:5px;' data-lockey="stats>total>singular"></div>
-                            <div class='medium statNum stat-soulstone' style='color:var(--stat-soulstone-color);' id='stattotalss'></div>
-                            <div class='medium statNum stat-talent' id='stattotalTalent'>0</div>
-                            <div class='medium statNum stat-level' id='stattotalLevel'>0</div>
+                <div role="table" aria-labelledby="statsTitle" id="statsContainer">
+                    <div role="row" class='statContainer stat-total showthat' id="totalStatContainer" aria-labelledby="statTotalLabel" aria-describedby="stattotalTooltip">
+                        <div role="none" class='statLabelContainer'>
+                            <label class='medium bold stat-name localized' id="statTotalLabel" style='margin-left:18px;margin-top:5px;' data-lockey="stats>total>singular"></label>
+                            <div role="status" aria-live="off" aria-label="Total soulstones" class='medium statNum stat-soulstone' style='color:var(--stat-soulstone-color);' id='stattotalss'></div>
+                            <div role="status" aria-live="off" aria-label="Total talent" class='medium statNum stat-talent' id='stattotalTalent'>0</div>
+                            <div role="status" aria-live="off" aria-label="Total level" class='medium statNum stat-level' id='stattotalLevel'>0</div>
                         </div>
-                        <div class='showthis' id='stattotalTooltip' style='width:225px;'>
+                        <div role="tooltip" class='showthis' id='stattotalTooltip' style='width:225px;'>
                             <div class='medium bold localized' data-lockey="stats>total>plural"></div>
                             <br>
                             <div class="localized" data-lockey="stats>total>blurb"></div>
@@ -103,217 +103,217 @@
                         </div>
                     </div>
                 </div>
-                <div id="skillList" style="width:100%;display:none">
-                    <div class="showthat">
-                        <div class="large bold localized" data-lockey="skills>title"></div>
-                        <div class="showthis localized" data-lockey="skills>tooltip>no_reset_on_restart"></div>
+                <div role="table" id="skillList" aria-labelledby="skillListTitle" style="width:100%;display:none">
+                    <div role="row" class="showthat" aria-label="Heading" aria-describedby="skillListHeadingTooltip">
+                        <div role="heading" id="skillListTitle" class="large bold localized" data-lockey="skills>title"></div>
+                        <div role="tooltip" id="skillListHeadingTooltip" class="showthis localized" data-lockey="skills>tooltip>no_reset_on_restart"></div>
                     </div><br>
-                    <div class="skillContainer showthat" id="skillSCombatContainer">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>scombat>label"></div>
-                        <div class="statNum medium"><div id="skillSCombatLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="showthis">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillSCombatLabel" aria-describedby="skillSCombatTooltip" id="skillSCombatContainer">
+                        <label id="skillSCombatLabel" class="skillLabel medium bold localized" data-lockey="skills>scombat>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillSCombatLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="tooltip" class="showthis">
                             <span class="localized" data-lockey="skills>scombat>desc"></span><br>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillTCombatContainer">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>tcombat>label"></div>
-                        <div class="statNum medium"><div id="skillTCombatLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="showthis">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillTCombatLabel" aria-describedby="skillTCombatTooltip" id="skillTCombatContainer">
+                        <label id="skillTCombatLabel" class="skillLabel medium bold localized" data-lockey="skills>tcombat>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillTCombatLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="tooltip" class="showthis">
                             <span class="localized" data-lockey="skills>tcombat>desc"></span><br>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillCombatContainer" onmouseover="view.showSkill('Combat')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>combat>label"></div>
-                        <div class="statNum medium"><div id="skillCombatLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillCombatLevelBar"></div></div>
-                        <div class="showthis">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillCombatLabel" aria-describedby="skillCombatTooltip" id="skillCombatContainer" onmouseover="view.showSkill('Combat')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillCombatLabel" class="skillLabel medium bold localized" data-lockey="skills>combat>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillCombatLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillCombatLevelBar"></div></div>
+                        <div role="tooltip" class="showthis">
                             <span class="localized" data-lockey="skills>combat>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillCombatLevelExp"></div>/<div id="skillCombatLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCombatLevelProgress"></div>%)</div><br>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillMagicContainer" onmouseover="view.showSkill('Magic')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>magic>label"></div>
-                        <div class="statNum medium"><div id="skillMagicLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillMagicLevelBar"></div></div>
-                        <div class="showthis">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillMagicLabel" aria-describedby="skillMagicTooltip" id="skillMagicContainer" onmouseover="view.showSkill('Magic')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillMagicLabel" class="skillLabel medium bold localized" data-lockey="skills>magic>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillMagicLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillMagicLevelBar"></div></div>
+                        <div role="tooltip" class="showthis">
                             <span class="localized" data-lockey="skills>magic>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillMagicLevelExp"></div>/<div id="skillMagicLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillMagicLevelProgress"></div>%)</div><br>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillPracticalContainer" onmouseover="view.showSkill('Practical')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>practical>label"></div>
-                        <div class="statNum medium"><div id="skillPracticalLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillPracticalLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillPracticalLabel" aria-describedby="skillPracticalTooltip" id="skillPracticalContainer" onmouseover="view.showSkill('Practical')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillPracticalLabel" class="skillLabel medium bold localized" data-lockey="skills>practical>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillPracticalLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillPracticalLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>practical>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillPracticalLevelExp"></div>/<div id="skillPracticalLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillPracticalLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>practical>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillAlchemyContainer" onmouseover="view.showSkill('Alchemy')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>alchemy>label">Alchemy</div>
-                        <div class="statNum medium"><div id="skillAlchemyLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillAlchemyLevelBar"></div></div>
-                        <div class="showthis">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillAlchemyLabel" aria-describedby="skillAlchemyTooltip" id="skillAlchemyContainer" onmouseover="view.showSkill('Alchemy')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillAlchemyLabel" class="skillLabel medium bold localized" data-lockey="skills>alchemy>label">Alchemy</label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillAlchemyLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillAlchemyLevelBar"></div></div>
+                        <div role="tooltip" class="showthis">
                             <span class="localized" data-lockey="skills>alchemy>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillAlchemyLevelExp"></div>/<div id="skillAlchemyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillAlchemyLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>alchemy>desc2"></span><br>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillDarkContainer" onmouseover="view.showSkill('Dark')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>dark>label"></div>
-                        <div class="statNum medium"><div id="skillDarkLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillDarkLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillDarkLabel" aria-describedby="skillDarkTooltip" id="skillDarkContainer" onmouseover="view.showSkill('Dark')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillDarkLabel" class="skillLabel medium bold localized" data-lockey="skills>dark>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillDarkLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillDarkLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>dark>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillDarkLevelExp"></div>/<div id="skillDarkLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillDarkLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>dark>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillCraftingContainer" onmouseover="view.showSkill('Crafting')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>crafting>label"></div>
-                        <div class="statNum medium"><div id="skillCraftingLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillCraftingLevelBar"></div></div>
-                        <div class="showthis">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillCraftingLabel" aria-describedby="skillCraftingTooltip" id="skillCraftingContainer" onmouseover="view.showSkill('Crafting')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillCraftingLabel" class="skillLabel medium bold localized" data-lockey="skills>crafting>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillCraftingLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillCraftingLevelBar"></div></div>
+                        <div role="tooltip" class="showthis">
                             <span class="localized" data-lockey="skills>crafting>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillCraftingLevelExp"></div>/<div id="skillCraftingLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCraftingLevelProgress"></div>%)</div><br>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillChronomancyContainer" onmouseover="view.showSkill('Chronomancy')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>chronomancy>label"></div>
-                        <div class="statNum medium"><div id="skillChronomancyLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillChronomancyLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillChronomancyLabel" aria-describedby="skillChronomancyTooltip" id="skillChronomancyContainer" onmouseover="view.showSkill('Chronomancy')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillChronomancyLabel" class="skillLabel medium bold localized" data-lockey="skills>chronomancy>label"></label>
+                        <div clas role="none"s="statNum medium"><div role="status" aria-live="off" id="skillChronomancyLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillChronomancyLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>chronomancy>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillChronomancyLevelExp"></div>/<div id="skillChronomancyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillChronomancyLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>chronomancy>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillPyromancyContainer" onmouseover="view.showSkill('Pyromancy')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>pyromancy>label"></div>
-                        <div class="statNum medium"><div id="skillPyromancyLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillPyromancyLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillPyromancyLabel" aria-describedby="skillPyromancyTooltip" id="skillPyromancyContainer" onmouseover="view.showSkill('Pyromancy')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillPyromancyLabel" class="skillLabel medium bold localized" data-lockey="skills>pyromancy>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillPyromancyLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillPyromancyLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>pyromancy>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillPyromancyLevelExp"></div>/<div id="skillPyromancyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillPyromancyLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>pyromancy>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillRestorationContainer" onmouseover="view.showSkill('Restoration')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>restoration>label"></div>
-                        <div class="statNum medium"><div id="skillRestorationLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillRestorationLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillRestorationLabel" aria-describedby="skillRestorationTooltip" id="skillRestorationContainer" onmouseover="view.showSkill('Restoration')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillRestorationLabel" class="skillLabel medium bold localized" data-lockey="skills>restoration>label"></label>
+                        <div clas role="none"s="statNum medium"><div role="status" aria-live="off" id="skillRestorationLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillRestorationLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>restoration>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillRestorationLevelExp"></div>/<div id="skillRestorationLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillRestorationLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>restoration>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillSpatiomancyContainer" onmouseover="view.showSkill('Spatiomancy')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>spatiomancy>label"></div>
-                        <div class="statNum medium"><div id="skillSpatiomancyLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillSpatiomancyLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillSpatiomancyLabel" aria-describedby="skillSpatiomancyTooltip" id="skillSpatiomancyContainer" onmouseover="view.showSkill('Spatiomancy')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillSpatiomancyLabel" class="skillLabel medium bold localized" data-lockey="skills>spatiomancy>label"></label>
+                        <div clas role="none"s="statNum medium"><div role="status" aria-live="off" id="skillSpatiomancyLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillSpatiomancyLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>spatiomancy>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillSpatiomancyLevelExp"></div>/<div id="skillSpatiomancyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillSpatiomancyLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>spatiomancy>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillMercantilismContainer" onmouseover="view.showSkill('Mercantilism')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>mercantilism>label"></div>
-                        <div class="statNum medium"><div id="skillMercantilismLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillMercantilismLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillMercantilismLabel" aria-describedby="skillMercantilismTooltip" id="skillMercantilismContainer" onmouseover="view.showSkill('Mercantilism')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillMercantilismLabel" class="skillLabel medium bold localized" data-lockey="skills>mercantilism>label"></label>
+                        <div clas role="none"s="statNum medium"><div role="status" aria-live="off" id="skillMercantilismLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillMercantilismLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>mercantilism>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillMercantilismLevelExp"></div>/<div id="skillMercantilismLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillMercantilismLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>mercantilism>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillDivineContainer" onmouseover="view.showSkill('Divine')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>divine>label"></div>
-                        <div class="statNum medium"><div id="skillDivineLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillDivineLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillDivineLabel" aria-describedby="skillDivineTooltip" id="skillDivineContainer" onmouseover="view.showSkill('Divine')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillDivineLabel" class="skillLabel medium bold localized" data-lockey="skills>divine>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillDivineLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillDivineLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>divine>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillDivineLevelExp"></div>/<div id="skillDivineLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillDivineLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>divine>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillCommuneContainer" onmouseover="view.showSkill('Commune')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>commune>label"></div>
-                        <div class="statNum medium"><div id="skillCommuneLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillCommuneLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillCommuneLabel" aria-describedby="skillCommuneTooltip" id="skillCommuneContainer" onmouseover="view.showSkill('Commune')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillCommuneLabel" class="skillLabel medium bold localized" data-lockey="skills>commune>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillCommuneLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillCommuneLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>commune>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillCommuneLevelExp"></div>/<div id="skillCommuneLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCommuneLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>commune>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillGluttonyContainer" onmouseover="view.showSkill('Gluttony')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>gluttony>label"></div>
-                        <div class="statNum medium"><div id="skillGluttonyLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillGluttonyLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillGluttonyLabel" aria-describedby="skillGluttonyTooltip" id="skillGluttonyContainer" onmouseover="view.showSkill('Gluttony')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillGluttonyLabel" class="skillLabel medium bold localized" data-lockey="skills>gluttony>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillGluttonyLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillGluttonyLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>gluttony>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillGluttonyLevelExp"></div>/<div id="skillGluttonyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillGluttonyLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>gluttony>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillWunderkindContainer" onmouseover="view.showSkill('Wunderkind')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>wunderkind>label"></div>
-                        <div class="statNum medium"><div id="skillWunderkindLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillWunderkindLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillWunderkindLabel" aria-describedby="skillWunderkindTooltip" id="skillWunderkindContainer" onmouseover="view.showSkill('Wunderkind')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillWunderkindLabel" class="skillLabel medium bold localized" data-lockey="skills>wunderkind>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillWunderkindLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillWunderkindLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>wunderkind>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillWunderkindLevelExp"></div>/<div id="skillWunderkindLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillWunderkindLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>wunderkind>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillThieveryContainer" onmouseover="view.showSkill('Thievery')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>thievery>label"></div>
-                        <div class="statNum medium"><div id="skillThieveryLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillThieveryLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillThieveryLabel" aria-describedby="skillThieveryTooltip" id="skillThieveryContainer" onmouseover="view.showSkill('Thievery')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillThieveryLabel" class="skillLabel medium bold localized" data-lockey="skills>thievery>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillThieveryLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillThieveryLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>thievery>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillThieveryLevelExp"></div>/<div id="skillThieveryLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillThieveryLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>thievery>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillLeadershipContainer" onmouseover="view.showSkill('Leadership')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>leadership>label"></div>
-                        <div class="statNum medium"><div id="skillLeadershipLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillLeadershipLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillLeadershipLabel" aria-describedby="skillLeadershipTooltip" id="skillLeadershipContainer" onmouseover="view.showSkill('Leadership')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillLeadershipLabel" class="skillLabel medium bold localized" data-lockey="skills>leadership>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillLeadershipLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillLeadershipLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>leadership>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillLeadershipLevelExp"></div>/<div id="skillLeadershipLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillLeadershipLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>leadership>desc2"></span>
                         </div>
                     </div>
-                    <div class="skillContainer showthat" id="skillAssassinContainer" onmouseover="view.showSkill('Assassin')" onmouseout="view.showSkill(undefined)">
-                        <div class="skillLabel medium bold localized" data-lockey="skills>assassin>label"></div>
-                        <div class="statNum medium"><div id="skillAssassinLevel">0</div></div>
-                        <div style="margin-top:18px;"></div>
-                        <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillAssassinLevelBar"></div></div>
-                        <div class="showthis" style="width:490px">
+                    <div class="skillContainer showthat" role="row" aria-labelledby="skillAssassinLabel" aria-describedby="skillAssassinTooltip" id="skillAssassinContainer" onmouseover="view.showSkill('Assassin')" onmouseout="view.showSkill(undefined)">
+                        <label id="skillAssassinLabel" class="skillLabel medium bold localized" data-lockey="skills>assassin>label"></label>
+                        <div role="none" class="statNum medium"><div role="status" aria-live="off" id="skillAssassinLevel">0</div></div>
+                        <div role="none" style="margin-top:18px;"></div>
+                        <div role="none" class="thinProgressBarUpper"><div role="progressbar" aria-label="Progress to next level" class="statBar skillExpBar townExpBar" id="skillAssassinLevelBar"></div></div>
+                        <div role="tooltip" class="showthis" style="width:490px">
                             <span class="localized" data-lockey="skills>assassin>desc"></span><br>
                             <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillAssassinLevelExp"></div>/<div id="skillAssassinLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillAssassinLevelProgress"></div>%)</div><br>
                             <span class="localized" data-lockey="skills>assassin>desc2"></span>
@@ -328,16 +328,16 @@
                     <br>
                     <div id="buffsContainer" style="display: flex;flex-direction: column;"></div>
                 </div>
-            </div>
+            </section>
         </div>
 
-        <div id="actionsColumn">
-            <div id="actionList" style="width:100%;text-align:center;">
-                <div class="showthat">
-                    <div class="large bold localized" style="margin-right: -49px;" data-lockey="actions>title_list"></div>
-                    <span id="predictorTotalDisplay" class="koviko"></span>
-                    <span id="predictorStatisticDisplay" class="koviko"></span>
-                    <div class="showthis">
+        <div role="none" id="actionsColumn">
+            <section aria-labelledby="actionList_title" id="actionList" style="width:100%;text-align:center;">
+                <div role="heading" aria-describedby="actionList_tooltip" class="showthat">
+                    <label id="actionList_title" class="large bold localized" style="margin-right: -49px;" data-lockey="actions>title_list"></label>
+                    <span role="status" aria-live="off" id="predictorTotalDisplay" class="koviko"></span>
+                    <span role="status" aria-live="off" id="predictorStatisticDisplay" class="koviko"></span>
+                    <div role="tooltip" id="actionList_tooltip" class="showthis">
                         <i class='actionIcon far fa-circle'></i> <span class='localized' data-lockey="actions>tooltip>icons>circle"></span><br>
                         <i class='actionIcon fas fa-plus'></i> <span class='localized' data-lockey="actions>tooltip>icons>plus"></span><br>
                         <i class='actionIcon fas fa-minus'></i> <span class='localized' data-lockey="actions>tooltip>icons>minus"></span><br>
@@ -349,25 +349,25 @@
                         <span class='localized' data-lockey="actions>tooltip>list_explanation"></span>
                     </div>
                 </div>
-                <div style="position: relative; left: 135px;">
+                <div role="none" style="position: relative; left: 135px;">
                     <button class="button" style="z-index: 0;" onclick="adjustActionListSize(100)"><i class="fas fa-plus"></i></button>
                     <button class="button" style="z-index: 0;" onclick="adjustActionListSize(-100)"><i class="fas fa-minus"></i></button>
                 </div>
                 <br>
-                <div id="expandableList">
-                    <div id="curActionsListContainer">
-                        <div id="curActionsList"></div>
-                        <div id="curActionsManaUsed" class="showthat">
-                            <div class="bold localized" data-lockey="actions>tooltip>mana_used"></div>
+                <div role="table" id="expandableList">
+                    <div role="rowgroup" id="curActionsListContainer">
+                        <div role="none" id="curActionsList"></div>
+                        <div role="row" aria-labelledby="curActionsManaUsed_label" aria-describedby="curActionsManaUsed_tooltip" id="curActionsManaUsed" class="showthat">
+                            <label id="curActionsManaUsed_label" class="bold localized" data-lockey="actions>tooltip>mana_used"></label>
                             <div id="totalTicks" style="font-size: 0.75rem;"></div>
-                            <div class="showthis localized" data-lockey="actions>tooltip>mana_used_explanation"></div>
+                            <div role="tooltip" class="showthis localized" id="curActionsManaUsed_tooltip" data-lockey="actions>tooltip>mana_used_explanation"></div>
                         </div>
                     </div>
-                    <div id="nextActionsListContainer">
-                        <div id="nextActionsList"></div>
-                        <div id="actionTooltipContainer" style="margin-top:10px;width:100%;text-align:left;max-height:357px;overflow:auto;"></div>
-                        <div id="nextActionsAmountButtons">
-                            <div class="bold localized" data-lockey="actions>tooltip>amount"></div>
+                    <div role="rowgroup" id="nextActionsListContainer">
+                        <div role="none" id="nextActionsList"></div>
+                        <div role="tooltip" id="actionTooltipContainer" style="margin-top:10px;width:100%;text-align:left;max-height:357px;overflow:auto;"></div>
+                        <div role="row" aria-labelledby="actionsAmountLabel" id="nextActionsAmountButtons">
+                            <label id="actionsAmountLabel" class="bold localized" data-lockey="actions>tooltip>amount"></label>
                             <button class="button change-amount" onclick="changeActionAmount(1)">1</button>
                             <button class="button change-amount" onclick="changeActionAmount(5)">5</button>
                             <button class="button change-amount" onclick="changeActionAmount(10)">10</button>
@@ -375,8 +375,8 @@
                         </div>
                     </div>
                 </div>
-                <div id="actionChanges" style="display:flex;text-align:left;width:100%;margin-top:5px;">
-                    <div id="actionChangeOptions" style="width:50%;">
+                <div role="none" id="actionChanges" style="display:flex;text-align:left;width:100%;margin-top:5px;">
+                    <div role="menu" aria-label="Action options" id="actionChangeOptions" style="width:50%;">
                         <input type="checkbox" id="keepCurrentListInput" class="checkbox" onchange="setOption('keepCurrentList', this.checked)">
                         <label for="keepCurrentListInput" class="localized" data-lockey="actions>tooltip>current_list_active"></label><br>
                         <input type="checkbox" id="repeatLastActionInput" class="checkbox" onchange="setOption('repeatLastAction', this.checked)">
@@ -384,11 +384,11 @@
                         <input type="checkbox" id="addActionsToTopInput" class="checkbox" onchange="setOption('addActionsToTop', this.checked)">
                         <label for="addActionsToTopInput" class="localized" data-lockey="actions>tooltip>add_action_top"></label>
                     </div>
-                    <div id="actionChangeButtons" style="margin-left:-4px;text-align:right;width:50%;">
+                    <div role="toolbar" id="actionChangeButtons" style="margin-left:-4px;text-align:right;width:50%;">
                         <button id="maxTraining" class="button localized" style="margin-right:0px;display:none" onclick="capAllTraining()" data-lockey="actions>tooltip>max_training"></button>
                         <button id="clearList" class="button localized" style="margin-right:0px;" onclick="clearList()" data-lockey="actions>tooltip>clear_list"></button>
-                        <div tabindex="0" class="showthatloadout">Manage Loadouts
-                            <div class="showthisloadout">
+                        <div role="button" aria-controls="loadout_popup" aria-describedby="loadout_popup" tabindex="0" class="showthatloadout">Manage Loadouts
+                            <div role="dialog" id="loadout_popup" class="showthisloadout">
                                 <button class="loadoutbutton unused" id="load1" onclick="selectLoadout(1)" style="width:200px">Loadout 1</button>
                                 <br>
                                 <button class="loadoutbutton unused" id="load2" onclick="selectLoadout(2)" style="width:200px">Loadout 2</button>
@@ -429,7 +429,7 @@
                         <select id='predictorTrackedStatInput' class='button' onchange="setOption('predictorTrackedStat', this.value)"></select>
                     </div>
                 </div>
-            </div>
+            </section>
 
             <div id="spells" style="width:100%;text-align:center;margin-top:10px;display:none">
                 <div class="showthat">
@@ -443,64 +443,64 @@
 
         </div>
 
-        <div id="townColumn" style="width:535px;vertical-align:top;">
-            <div id="shortTownColumn">
-                <div id="townWindow" style="width:100%;text-align:center;height:34px">
-                    <div style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="townViewLeft" onclick="view.showTown(townsUnlocked[townsUnlocked.indexOf(townShowing)-1])"></div>
-                    <div class="showthat">
-                        <div class="large bold"><select class="bold" style="text-align:center" id="TownSelect"></select></div>
-                        <div id='townDesc' class='showthis'></div>
+        <div role="none" id="townColumn" style="width:535px;vertical-align:top;">
+            <section aria-label="Zone" id="shortTownColumn">
+                <div role="heading" aria-labelledby="TownSelect" id="townWindow" style="width:100%;text-align:center;height:34px">
+                    <button role="tab" aria-label="Previous zone" title="Previous zone" style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="townViewLeft" onclick="view.showTown(townsUnlocked[townsUnlocked.indexOf(townShowing)-1])"></button>
+                    <div role="none" class="showthat">
+                        <div role="none" class="large bold"><select aria-label="Select zone" aria-describedby="townDesc" class="bold" style="text-align:center" id="TownSelect"></select></div>
+                        <div role="tooltip" id='townDesc' class='showthis'></div>
                     </div>
-                    <div style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="townViewRight" onclick="view.showTown(townsUnlocked[townsUnlocked.indexOf(townShowing)+1])"></div>
-                    <div id="hideVarsButton" class="far fa-eye" onclick="view.toggleHiding()"></div>
+                    <button role="tab" aria-label="Next zone" title="Next zone" style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="townViewRight" onclick="view.showTown(townsUnlocked[townsUnlocked.indexOf(townShowing)+1])"></button>
+                    <button aria-label="Toggle hiding of variables" title="Toggle hiding of variables" id="hideVarsButton" class="far fa-eye" onclick="view.toggleHiding()"></button>
                 </div><br>
-                <div id="townInfos">
-                    <div id="townInfo0" class='townInfo'></div>
-                    <div id="townInfo1" class='townInfo' style="display:none;"></div>
-                    <div id="townInfo2" class='townInfo' style="display:none;"></div>
-                    <div id="townInfo3" class='townInfo' style="display:none;"></div>
-                    <div id="townInfo4" class='townInfo' style="display:none;"></div>
-                    <div id="townInfo5" class='townInfo' style="display:none;"></div>
-                    <div id="townInfo6" class='townInfo' style="display:none;"></div>
-                    <div id="townInfo7" class='townInfo' style="display:none;"></div>
-                    <div id="townInfo8" class='townInfo' style="display:none;"></div>
+                <div role="none" id="townInfos">
+                    <div role="tabpanel" id="townInfo0" class='townInfo'></div>
+                    <div role="tabpanel" id="townInfo1" class='townInfo' style="display:none;"></div>
+                    <div role="tabpanel" id="townInfo2" class='townInfo' style="display:none;"></div>
+                    <div role="tabpanel" id="townInfo3" class='townInfo' style="display:none;"></div>
+                    <div role="tabpanel" id="townInfo4" class='townInfo' style="display:none;"></div>
+                    <div role="tabpanel" id="townInfo5" class='townInfo' style="display:none;"></div>
+                    <div role="tabpanel" id="townInfo6" class='townInfo' style="display:none;"></div>
+                    <div role="tabpanel" id="townInfo7" class='townInfo' style="display:none;"></div>
+                    <div role="tabpanel" id="townInfo8" class='townInfo' style="display:none;"></div>
                 </div>
 
-                <div id="townActionTitle" class="block showthat" style="text-align:center;">
-                    <div style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="actionsViewLeft" onclick="view.showActions(false)"></div>
+                <div role="heading" aria-labelledby="actionsTitle" aria-describedby="actionsTooltip" id="townActionTitle" class="block showthat" style="text-align:center;">
+                    <button role="tab" style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="actionsViewLeft" onclick="view.showActions(false)"></button>
                     <span class='large bold' id="actionsTitle"></span>
-                    <div class='showthis localized' data-lockey="actions>tooltip>desc"></div>
-                    <div style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="actionsViewRight" onclick="view.showActions(true)"></div>
+                    <div role="tooltip" id="actionsTooltip" class='showthis localized' data-lockey="actions>tooltip>desc"></div>
+                    <button role="tab" style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="actionsViewRight" onclick="view.showActions(true)"></button>
                 </div>
-                <div id="townActions">
-                    <div id="actionOptionsTown0" class='actionOptions'></div>
-                    <div id="actionOptionsTown1" class='actionOptions' style="display:none;"></div>
-                    <div id="actionOptionsTown2" class='actionOptions' style="display:none;"></div>
-                    <div id="actionOptionsTown3" class='actionOptions' style="display:none;"></div>
-                    <div id="actionOptionsTown4" class='actionOptions' style="display:none;"></div>
-                    <div id="actionOptionsTown5" class='actionOptions' style="display:none;"></div>
-                    <div id="actionOptionsTown6" class='actionOptions' style="display:none;"></div>
-                    <div id="actionOptionsTown7" class='actionOptions' style="display:none;"></div>
-                    <div id="actionOptionsTown8" class='actionOptions' style="display:none;"></div>
-                    <div id="actionStoriesTown0" class='actionStories' style="display:none;"></div>
-                    <div id="actionStoriesTown1" class='actionStories' style="display:none;"></div>
-                    <div id="actionStoriesTown2" class='actionStories' style="display:none;"></div>
-                    <div id="actionStoriesTown3" class='actionStories' style="display:none;"></div>
-                    <div id="actionStoriesTown4" class='actionStories' style="display:none;"></div>
-                    <div id="actionStoriesTown5" class='actionStories' style="display:none;"></div>
-                    <div id="actionStoriesTown6" class='actionStories' style="display:none;"></div>
-                    <div id="actionStoriesTown7" class='actionStories' style="display:none;"></div>
-                    <div id="actionStoriesTown8" class='actionStories' style="display:none;"></div>
-                    <div id="addActionAtCapText" class="localized" data-lockey="actions>tooltip>add_at_cap"></div>
+                <div role="none" id="townActions">
+                    <div role="tabpanel" id="actionOptionsTown0" class='actionOptions'></div>
+                    <div role="tabpanel" id="actionOptionsTown1" class='actionOptions' style="display:none;"></div>
+                    <div role="tabpanel" id="actionOptionsTown2" class='actionOptions' style="display:none;"></div>
+                    <div role="tabpanel" id="actionOptionsTown3" class='actionOptions' style="display:none;"></div>
+                    <div role="tabpanel" id="actionOptionsTown4" class='actionOptions' style="display:none;"></div>
+                    <div role="tabpanel" id="actionOptionsTown5" class='actionOptions' style="display:none;"></div>
+                    <div role="tabpanel" id="actionOptionsTown6" class='actionOptions' style="display:none;"></div>
+                    <div role="tabpanel" id="actionOptionsTown7" class='actionOptions' style="display:none;"></div>
+                    <div role="tabpanel" id="actionOptionsTown8" class='actionOptions' style="display:none;"></div>
+                    <div role="tabpanel" id="actionStoriesTown0" class='actionStories' style="display:none;"></div>
+                    <div role="tabpanel" id="actionStoriesTown1" class='actionStories' style="display:none;"></div>
+                    <div role="tabpanel" id="actionStoriesTown2" class='actionStories' style="display:none;"></div>
+                    <div role="tabpanel" id="actionStoriesTown3" class='actionStories' style="display:none;"></div>
+                    <div role="tabpanel" id="actionStoriesTown4" class='actionStories' style="display:none;"></div>
+                    <div role="tabpanel" id="actionStoriesTown5" class='actionStories' style="display:none;"></div>
+                    <div role="tabpanel" id="actionStoriesTown6" class='actionStories' style="display:none;"></div>
+                    <div role="tabpanel" id="actionStoriesTown7" class='actionStories' style="display:none;"></div>
+                    <div role="tabpanel" id="actionStoriesTown8" class='actionStories' style="display:none;"></div>
+                    <div role="note" id="addActionAtCapText" class="localized" data-lockey="actions>tooltip>add_at_cap"></div>
                 </div>
-            </div>
-            <div id="actionLogContainer">
+            </section>
+            <section aria-labelledby="actionLogTitle" id="actionLogContainer">
                 <div id="actionLogTitle" class="large bold block localized" data-lockey="actions>title_log" style="margin:10px auto 2px auto;text-align:center;"></div>
                 <ul id="actionLog">
                     <li id="actionLogLoadPrevious" class="small italic localized" data-lockey="actions>log>load_previous" onclick="actionLog.loadHistory(5)"></li>
                     <li id="actionLogLatest" class="small italic localized" data-lockey="actions>log>latest"></li>
                 </ul>
-            </div>
+            </section>
         </div>
 
     </main>
@@ -512,10 +512,10 @@
         <a id="navbar_stats" href="#statsColumn" class="nav localized" data-lockey="menu>navigation>stats" onclick="return scrollToPanel(event, 'statsColumn')"></a>
     </nav>
 
-    <div id="tutorial" style="position:absolute;width:100%;height:100%;left:0;top:0;z-index:9999;">
-        <div style="width:100%;height:100%;background-color:grey;position:relative;opacity:.5"></div>
-        <div style="padding:20px;background-color:var(--body-background);border:1px solid var(--input-border);position:absolute;text-align:left;left:150px;top:150px;">
-            <span class="localized" data-lockey="tutorial"></span>
+    <div id="tutorial" role="dialog" aria-label="Tutorial" aria-describedby="tutorial-text" aria-modal="true" style="position:absolute;width:100%;height:100%;left:0;top:0;z-index:9999;">
+        <div role="none" style="width:100%;height:100%;background-color:grey;position:relative;opacity:.5"></div>
+        <div role="none" style="padding:20px;background-color:var(--body-background);border:1px solid var(--input-border);position:absolute;text-align:left;left:150px;top:150px;">
+            <p role="" id="tutorial-text" class="localized" data-lockey="tutorial"></p>
             <button class="button" onclick="closeTutorial()">OK</button>
         </div>
     </div>

@@ -28,16 +28,16 @@ const menuView = Views.registerView("menu", {
         ];
         const disabledMenus = this.getDisabledMenus();
         const html =
-        `<li id='menusMenu' tabindex='0' style='display:inline-block;height:30px;margin-right:10px;' class='showthatH${menus.map(menu => disabledMenus.includes(menu) ? ` disabled-${menu}` : "").join("")}'>
-            <i class='fas fa-bars'></i>
-            <div class='showthisH' id='menus'>
-                <ul>
+/*html*/`<li role='menuitem' aria-haspopup='menu' aria-describedby='menus' aria-label='Menu configuration menu' id='menusMenu' tabindex='0' style='display:inline-block;height:30px;margin-right:10px;' class='showthatH${menus.map(menu => disabledMenus.includes(menu) ? ` disabled-${menu}` : "").join("")}'>
+            <i role='none' class='fas fa-bars'></i>
+            <div role='menu' class='showthisH' id='menus'>
+                <menu role='presentation'>
                     ${menus.map(menu => `
-                    <li>
+                    <li role='menuitem' aria-labelledby='enableMenu_${menu}_label'>
                         <input type='checkbox' id='enableMenu_${menu}' data-menu='${menu}' onchange='Views.menu.onEnableMenu(this)' ${disabledMenus.includes(menu) ? "" : "checked"}>
-                        <label for='enableMenu_${menu}'>${_txt(`menu>${menu}>meta>title`)}</label>
+                        <label id='enableMenu_${menu}_label' for='enableMenu_${menu}'>${_txt(`menu>${menu}>meta>title`)}</label>
                     </li>`).join("\n")}
-                </ul>
+                </menu>
             </div>
         </li>`;
         return html;
@@ -69,31 +69,31 @@ const menuView = Views.registerView("menu", {
         $(versions).each((_index, version) => {
             const caption = $(version).attr("caption");
             const verNum = $(version).attr("verNum");
-            html += `
-                    <li class='showthat2' tabindex='0' ${verNum ? `data-verNum="${verNum}"` : ""}>
-                        ${caption ? caption : `${_txt("menu>changelog>meta>version_prefix")} ${verNum}`}
-                        <div class='showthis2'>
+            html += /*html*/`
+                    <li role='menuitem' aria-haspopup='dialog' aria-labelledby='version_${verNum}_label' aria-describedby='version_${verNum}_text' class='showthat2' tabindex='0' ${verNum ? `data-verNum="${verNum}"` : ""}>
+                        <label id='version_${verNum}_label'>${caption ? caption : `${_txt("menu>changelog>meta>version_prefix")} ${verNum}`}</label>
+                        <p id='version_${verNum}_text' class='showthis2'>
                             ${$(version).text()}
-                        </div>
+                        </p>
                     </li>`;
         });
         return html;
     },
     htmlChangelog() {
         const html =
-        `<li id='changelogMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt("menu>changelog>meta>title")}
-            <ul class='showthisH' id='changelog'>
+/*html*/`<li role='menuitem' aria-haspopup='menu' aria-labelledby='changelogMenu_label' aria-describedby='changelog' id='changelogMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+            <label id='changelogMenu_label'>${_txt("menu>changelog>meta>title")}</label>
+            <menu class='showthisH' id='changelog'>
                 ${this.versions()}
-            </ul>
+            </menu>
         </li>`;
         return html;
     },
     htmlSaveMenu() {
         const html =
-        `<li id='saveMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt("menu>save>meta>title")}
-            <div class='showthisH'>
+/*html*/`<li role='menuitem' aria-haspopup='dialog' aria-labelledby='saveMenu_label' aria-describedby='saveMenu_popup' id='saveMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+            <label id='saveMenu_label'>${_txt("menu>save>meta>title")}</label>
+            <div role='dialog' id='saveMenu_popup' class='showthisH'>
                 <button class='button' onclick='save()'>${_txt("menu>save>manual_save")}</button>
                 <br>
                 <textarea id='exportImportList'></textarea><label for='exportImportList'> ${_txt("menu>save>list_label")}</label>
@@ -125,11 +125,11 @@ const menuView = Views.registerView("menu", {
     FAQs() {
         let html = "";
         const QAs = _txtsObj("menu>faq>q_a");
-        $(QAs).each((_index, QA) => {
-            html += `
-                <li class='showthat2' tabindex='0'>
-                    ${$(QA).find("q").html()}
-                    <div class='showthis2'>
+        $(QAs).each((index, QA) => {
+            html += /*html*/`
+                <li role='menuitem' aria-haspopup='dialog' aria-labelledby='faq_${index}_q' aria-describedby='faq_${index}_a' class='showthat2' tabindex='0'>
+                    <label id='faq_${index}_q'>${$(QA).find("q").html()}</label>
+                    <div id='faq_${index}_a' role='dialog' class='showthis2'>
                         ${$(QA).find("a").html()}
                     </div>
                 </li>`;
@@ -138,19 +138,19 @@ const menuView = Views.registerView("menu", {
     },
     htmlFAQMenu() {
         const html = 
-        `<li id='faqMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt("menu>faq>meta>title")}
-            <ul class='showthisH' id="faq">
+/*html*/`<li role='menuitem' aria-haspopup='menu' aria-labelledby='faqMenu_label' aria-describedby='faq' id='faqMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+            <label id='faqMenu_label'>${_txt("menu>faq>meta>title")}</label>
+            <menu class='showthisH' id="faq">
                 ${this.FAQs()}
-            </ul>
+            </menu>
         </li>`;
         return html;
     },
     htmlOptionsMenu() {
         const html =
-            `<li id='optionsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt("menu>options>meta>title")}
-            <div class='showthisH'>
+    /*html*/`<li role='menuitem' aria-haspopup='dialog' aria-labelledby='optionsMenu_label' aria-describedby='optionsMenu_popup' id='optionsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+            <label id='optionsMenu_label'>${_txt("menu>options>meta>title")}</label>
+            <div role='dialog' id='optionsMenu_popup' class='showthisH'>
                 <a target='_blank' href='${_txt("menu>options>discord>link")}'>${_txt("menu>options>discord>title")}</a><br>
                 ${Views.menu.htmlThemeMenu()}
                 ${Object.keys(Localization.supportedLang).length > 1 ? Views.menu.htmlLocalizationMenu() : ""}
@@ -225,9 +225,9 @@ const menuView = Views.registerView("menu", {
     },
     htmlExtrasMenu() {
         const html =
-            `<li id='extrasMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt("menu>extras>meta>title")}
-            <div class='showthisH' style='padding-top:1ex'>
+    /*html*/`<li role='menuitem' aria-haspopup='dialog' aria-labelledby='extrasMenu_label' aria-describedby='extrasMenu_popup' id='extrasMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+            <label id='extrasMenu_label'>${_txt("menu>extras>meta>title")}</label>
+            <div role='dialog' id='extrasMenu_popup' class='showthisH' style='padding-top:1ex'>
                 ${_txt("menu>options>extras_warning")}<br>
                 <br>
                 <input id='fractionalManaInput' type='checkbox' onchange='setOption("fractionalMana", this.checked)'/>
@@ -293,9 +293,9 @@ const menuView = Views.registerView("menu", {
     },
     htmlChallengeMenu() {
         const html = 
-        `<li id='challengesMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt("menu>challenges>meta>title")}
-            <div class='showthisH'>
+        `<li role='menuitem' aria-haspopup='dialog' aria-labelledby='challengesMenu_label' aria-describedby='challengesMenu_popup' id='challengesMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+            <label id='challengesMenu_label'>${_txt("menu>challenges>meta>title")}</label>
+            <div role='dialog' id='challengesMenu_popup' class='showthisH'>
                 ${this.challenges()}
             </div>
         </li>`;
@@ -303,9 +303,9 @@ const menuView = Views.registerView("menu", {
     },
     htmlTotalsMenu() {
         const html = 
-        `<li id='totalsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt("menu>totals>meta>title")}
-            <div class='showthisH'>
+        `<li role='menuitem' aria-haspopup='menu' aria-labelledby='totalsMenu_label' aria-describedby='totalsMenu_popup' id='totalsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+            <label id='totalsMenu_popup'>${_txt("menu>totals>meta>title")}</label>
+            <div role='dialog' id='_popup' class='showthisH'>
                 ${this.totals()}
             </div>
         </li>`;
@@ -313,9 +313,9 @@ const menuView = Views.registerView("menu", {
     },
     htmlPrestigeMenu() {
         const html = 
-        `<li id='prestige_bonusesMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt("menu>prestige_bonus>meta>title")}
-            <div class='showthisH'>
+        `<li role='menuitem' aria-haspopup='menu' aria-labelledby='prestige_bonusesMenu_label' aria-describedby='prestige_bonusesMenu_popup' id='prestige_bonusesMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+            <label id='prestige_bonusesMenu_popup'>${_txt("menu>prestige_bonus>meta>title")}</label>
+            <div role='dialog' id='_popup' class='showthisH'>
                 ${this.prestige_bonuses()}
             </div>
         </li>`;

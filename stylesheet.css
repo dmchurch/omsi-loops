@@ -34,7 +34,7 @@ menu > li:focus-within, #story_control:focus-within, #story_control:focus-within
     pointer-events: none; /* repeating to override the initial */
 }
 
-#menus > ul {
+#menus > menu {
     list-style: none;
     padding: 0;
 }
@@ -224,7 +224,7 @@ body:not(.loading) > .hideWhenLoaded {
     overscroll-behavior: contain;
 }
 
-:is(.showthatH,.showthatH:hover) ul.showthisH {
+:is(.showthatH,.showthatH:hover) ul.showthisH, :is(.showthatH,.showthatH:hover) menu.showthisH {
     list-style: none;
     display: flex;
     flex-direction: column;
@@ -1006,6 +1006,10 @@ input[type="checkbox"][disabled] + label {
 
 .townContainer {
     display: contents;
+}
+.townContainer:has(>.hidden) {
+    /* Because display: contents doesn't keep it out of the accessibility tree */
+    display: none;
 }
 .townContainer > div {
     grid-column: full-row;

@@ -8,10 +8,10 @@ const trackedResourcesView = Views.registerView("trackedResources", {
             const resetOnRestart = !$(resource).attr("no_reset_on_restart");
             const isHidden = $(resource).attr("initially_hidden");
             html +=
-                `<div class='showthat resource'${isHidden ? ` style='display:none' id='${$(resource).attr("id")}Div'` : ""}>
-                    <div class='bold'>${$(resource).find("title").text()}</div>
+        /*html*/`<div role='listitem' aria-atomic="true" aria-labelledby='${$(resource).attr("id")}_label' aria-haspopup='tooltip' aria-describedby='${$(resource).attr("id")}_tip' class='showthat resource'${isHidden ? ` style='display:none' id='${$(resource).attr("id")}Div'` : ""}>
+                    <div role='label' id='${$(resource).attr("id")}_label' class='bold'>${$(resource).find("title").text()}</div>
                     ${hasCount ? `<div id='${$(resource).attr("id")}'>0</div>` : ""}
-                    <div class='showthis'>
+                    <div role='tooltip' class='showthis' id='${$(resource).attr("id")}_tip'>
                         ${$(resource).find("desc").text()}
                         ${resetOnRestart ? `<br>${_txt("tracked_resources>reset_on_restart_txt")}` : ""}
                     </div>

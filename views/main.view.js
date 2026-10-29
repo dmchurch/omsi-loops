@@ -102,27 +102,27 @@ class View {
         for (const stat of statList) {
             const axisTip = statGraph.getAxisTip(stat);
             totalContainer.insertAdjacentHTML("beforebegin",
-            Raw.html`<div class='statContainer showthat stat-${stat}' style='left:${axisTip[0]}%;top:${axisTip[1]+3}%;' onmouseover='view.showStat("${stat}")' onmouseout='view.showStat(undefined)'>
-                <div class='statLabelContainer'>
-                    <div class='medium bold stat-name long-form' style='margin-left:18px;margin-top:5px;'>${_txt(`stats>${stat}>long_form`)}</div>
-                    <div class='medium bold stat-name short-form' style='margin-left:18px;margin-top:5px;'>${_txt(`stats>${stat}>short_form`)}</div>
-                    <div class='medium statNum stat-soulstone' style='color:var(--stat-soulstone-color);' id='stat${stat}ss'></div>
-                    <div class=' statNum stat-talent'></div>
-                    <div class='medium statNum stat-talent statBarWrapper'>
-                        <div class='thinProgressBarLower tiny talentBar'><div class='statBar statTalentBar' id='stat${stat}TalentBar'></div></div>
-                        <div class='label' id='stat${stat}Talent'>0</div>
+            Raw.html`<div role='row' aria-labelledby='stat${stat}Label' aria-describedby='stat${stat}Tooltip' class='statContainer showthat stat-${stat}' style='left:${axisTip[0]}%;top:${axisTip[1]+3}%;' onmouseover='view.showStat("${stat}")' onmouseout='view.showStat(undefined)'>
+                <div role='none' class='statLabelContainer'>
+                    <label id='stat${stat}Label' class='medium bold stat-name long-form' style='margin-left:18px;margin-top:5px;'>${_txt(`stats>${stat}>long_form`)}</label>
+                    <div role='label' class='medium bold stat-name short-form' style='margin-left:18px;margin-top:5px;'>${_txt(`stats>${stat}>short_form`)}</div>
+                    <div role='status' aria-live='off' aria-label='Soulstones' class='medium statNum stat-soulstone' style='color:var(--stat-soulstone-color);' id='stat${stat}ss'></div>
+                    <div role='none' class=' statNum stat-talent'></div>
+                    <div role='none' class='medium statNum stat-talent statBarWrapper'>
+                        <div role='none' class='thinProgressBarLower tiny talentBar'><div role='progressbar' aria-label='Progress to next talent level' class='statBar statTalentBar' id='stat${stat}TalentBar'></div></div>
+                        <div class='label' role='status' aria-live='off' aria-label='Talent'  id='stat${stat}Talent'>0</div>
                     </div>
-                    <div class='medium statNum stat-level statBarWrapper'>
-                        <div class='thinProgressBarLower tiny expBar'><div class='statBar statLevelBar' id='stat${stat}LevelBar'></div></div>
-                        <div class='label bold' id='stat${stat}Level'>0</div>
+                    <div role='none' class='medium statNum stat-level statBarWrapper'>
+                        <div role='none' class='thinProgressBarLower tiny expBar'><div role='progressbar' aria-label='Progress to next level' class='statBar statLevelBar' id='stat${stat}LevelBar'></div></div>
+                        <div class='label bold' role='status' aria-live='off' aria-label='Level' id='stat${stat}Level'>0</div>
                     </div>
                 </div>
-                <div class='statBars'>
-                    <div class='thinProgressBarUpper expBar'><div class='statBar statLevelLogBar logBar' id='stat${stat}LevelLogBar'></div></div>
-                    <div class='thinProgressBarLower talentBar'><div class='statBar statTalentLogBar logBar' id='stat${stat}TalentLogBar'></div></div>
-                    <div class='thinProgressBarLower soulstoneBar'><div class='statBar statSoulstoneLogBar logBar' id='stat${stat}SoulstoneLogBar'></div></div>
+                <div role='none' class='statBars'>
+                    <div role='none' class='thinProgressBarUpper expBar'><div role='progressbar' aria-label='Current level' class='statBar statLevelLogBar logBar' id='stat${stat}LevelLogBar'></div></div>
+                    <div role='none' class='thinProgressBarLower talentBar'><div role='progressbar' aria-label='Current talent' class='statBar statTalentLogBar logBar' id='stat${stat}TalentLogBar'></div></div>
+                    <div role='none' class='thinProgressBarLower soulstoneBar'><div role='progressbar' aria-label='Current soulstones' class='statBar statSoulstoneLogBar logBar' id='stat${stat}SoulstoneLogBar'></div></div>
                 </div>
-                <div class='showthis' id='stat${stat}Tooltip' style='width:225px;'>
+                <div role='tooltip' class='showthis' id='stat${stat}Tooltip' style='width:225px;'>
                     <div class='medium bold'>${_txt(`stats>${stat}>long_form`)}</div><br>${_txt(`stats>${stat}>blurb`)}
                     <br>
                     <div class='medium bold'>${_txt("stats>tooltip>level")}:</div> <div id='stat${stat}Level2'></div>
@@ -531,7 +531,10 @@ class View {
     }
 
     updateTime() {
-        document.getElementById("timeBar").style.width = `${100 - timer / timeNeeded * 100}%`;
+        const timeBar = htmlElement("timeBar")
+        timeBar.style.width = `${100 - timer / timeNeeded * 100}%`;
+        timeBar.ariaValueMax = `${timeNeeded}`
+        timeBar.ariaValueMax = `${timeNeeded - timer}`
         document.getElementById("timer").textContent = `${intToString((timeNeeded - timer), options.fractionalMana ? 2 : 1, true)} | ${formatTime((timeNeeded - timer) / 50 / getActualGameSpeed())}`;
         this.adjustGoldCost({varName:"Wells", cost: Action.ManaWell.goldCost()});
     };
@@ -666,9 +669,11 @@ class View {
             .selectAll(".nextActionContainer")
             .data(actions.next.map((a, index) => ({...a, actionId: a.actionId /* not enumerable by design */, index, action: getActionPrototype(a.name)})), a => a.actionId)
             .join(enter => enter
-                .append(({action, actionId: i}) => Rendered.html`
+                .append(({action, actionId: i, loops}) => Rendered.html`
                     <div
                         id='nextActionContainer${i}'
+                        role='row'
+                        aria-label='Step ${i+1}: ${action.label} × ${loops}'
                         class='nextActionContainer small showthat'
                         ondragover=${handleDragOver}
                         ondrop=${handleDragDrop}
@@ -678,18 +683,18 @@ class View {
                         ondragleave=${dragExitUndecorate.bind(null, i)}
                         draggable='true' data-action-id='${i}'
                     >
-                        <div class='nextActionLoops'><img class='smallIcon imageDragFix'> ×
-                        <div class='bold'></div></div>
-                        <div class='nextActionButtons'>
-                            <button onclick=${capAction.bind(null, i)}      class='capButton actionIcon far fa-circle'></button>
-                            <button onclick=${addLoop.bind(null, i)}        class='plusButton actionIcon fas fa-plus'></button>
-                            <button onclick=${removeLoop.bind(null, i)}     class='minusButton actionIcon fas fa-minus'></button>
-                            <button onclick=${split.bind(null, i)}          class='splitButton actionIcon fas fa-arrows-alt-h'></button>
-                            <button onclick=${collapse.bind(null, i)}       class='collapseButton actionIcon fas fa-compress-alt'></button>
-                            <button onclick=${moveUp.bind(null, i)}         class='upButton actionIcon fas fa-sort-up'></button>
-                            <button onclick=${moveDown.bind(null, i)}       class='downButton actionIcon fas fa-sort-down'></button>
-                            <button onclick=${disableAction.bind(null, i)}  class='skipButton actionIcon far fa-times-circle'></button>
-                            <button onclick=${removeAction.bind(null, i)}   class='removeButton actionIcon fas fa-times'></button>
+                        <div role='cell' id='nextActionLoops${i}' class='nextActionLoops'><img role='graphics-symbol' aria-labelledby='actionLabel${action.varName}' class='smallIcon imageDragFix'> ×
+                        <div role='status' class='bold'></div></div>
+                        <div role='toolbar' aria-label='Action edit toolbar' class='nextActionButtons'>
+                            <button aria-label='Cap to current max' onclick=${capAction.bind(null, i)}      class='capButton actionIcon far fa-circle'></button>
+                            <button aria-label='Add one loop' onclick=${addLoop.bind(null, i)}        class='plusButton actionIcon fas fa-plus'></button>
+                            <button aria-label='Subtract one loop' onclick=${removeLoop.bind(null, i)}     class='minusButton actionIcon fas fa-minus'></button>
+                            <button aria-label='Split action' onclick=${split.bind(null, i)}          class='splitButton actionIcon fas fa-arrows-alt-h'></button>
+                            <button aria-label='Collapse/expand zone' onclick=${collapse.bind(null, i)}       class='collapseButton actionIcon fas fa-compress-alt'></button>
+                            <button aria-label='Move action up' onclick=${moveUp.bind(null, i)}         class='upButton actionIcon fas fa-sort-up'></button>
+                            <button aria-label='Move action down' onclick=${moveDown.bind(null, i)}       class='downButton actionIcon fas fa-sort-down'></button>
+                            <button aria-label='Disable/enable action' onclick=${disableAction.bind(null, i)}  class='skipButton actionIcon far fa-times-circle'></button>
+                            <button aria-label='Remove action' onclick=${removeAction.bind(null, i)}   class='removeButton actionIcon fas fa-times'></button>
                         </div>
                         <ul class='koviko'></ul>
                     </div>
@@ -749,8 +754,8 @@ class View {
             const actionLoops = action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops);
             const actionLoopsDone = (action.loops - action.loopsLeft) > 99999 ? toSuffix(action.loops - action.loopsLeft) : formatNumber(action.loops - action.loopsLeft);
             const imageName = action.name.startsWith("Assassin") ? "assassin" : camelize(action.name);
-            totalDivText +=
-                `<div class='curActionContainer small' onmouseover='view.mouseoverAction(${i}, true)' onmouseleave='view.mouseoverAction(${i}, false)'>
+            totalDivText += Raw.html`
+                <div class='curActionContainer small' onmouseover='view.mouseoverAction(${i}, true)' onmouseleave='view.mouseoverAction(${i}, false)'>
                     <div class='curActionBar' id='action${i}Bar'></div>
                     <div class='actionSelectedIndicator' id='action${i}Selected'></div>
                     <img src='img/${imageName}.svg' class='smallIcon'>
@@ -765,21 +770,21 @@ class View {
 
         for (let i = 0; i < actions.current.length; i++) {
             const action = actions.current[i];
-            totalDivText +=
-                `<div id='actionTooltip${i}' style='display:none;padding-left:10px;width:90%'>` +
-                    `<div style='text-align:center;width:100%'>${action.label}</div><br><br>` +
-                    `<b>${_txt("actions>current_action>mana_original")}</b> <div id='action${i}ManaOrig'></div><br>` +
-                    `<b>${_txt("actions>current_action>mana_used")}</b> <div id='action${i}ManaUsed'></div><br>` +
-                    `<b>${_txt("actions>current_action>last_mana")}</b> <div id='action${i}LastMana'></div><br>` +
-                    `<b>${_txt("actions>current_action>mana_remaining")}</b> <div id='action${i}Remaining'></div><br>` +
-                    `<b>${_txt("actions>current_action>gold_remaining")}</b> <div id='action${i}GoldRemaining'></div><br>` +
-                    `<b>${_txt("actions>current_action>time_spent")}</b> <div id='action${i}TimeSpent'></div><br>` +
-                    `<b>${_txt("actions>current_action>total_time_elapsed")}</b> <div id='action${i}TotalTimeElapsed'></div><br>` +
+            totalDivText += Raw.html`
+                <div role='tooltip' id='actionTooltip${i}' style='display:none;padding-left:10px;width:90%'>` +
+                    `<label style='text-align:center;width:100%'>${action.label}</label><br><br>` +
+                    `<b role='label'>${_txt("actions>current_action>mana_original")}</b> <div role='status' aria-live='off' id='action${i}ManaOrig'></div><br>` +
+                    `<b role='label'>${_txt("actions>current_action>mana_used")}</b> <div role='status' aria-live='off' id='action${i}ManaUsed'></div><br>` +
+                    `<b role='label'>${_txt("actions>current_action>last_mana")}</b> <div role='status' aria-live='off' id='action${i}LastMana'></div><br>` +
+                    `<b role='label'>${_txt("actions>current_action>mana_remaining")}</b> <div role='status' aria-live='off' id='action${i}Remaining'></div><br>` +
+                    `<b role='label'>${_txt("actions>current_action>gold_remaining")}</b> <div role='status' aria-live='off' id='action${i}GoldRemaining'></div><br>` +
+                    `<b role='label'>${_txt("actions>current_action>time_spent")}</b> <div role='status' aria-live='off' id='action${i}TimeSpent'></div><br>` +
+                    `<b role='label'>${_txt("actions>current_action>total_time_elapsed")}</b> <div role='status' aria-live='off' id='action${i}TotalTimeElapsed'></div><br>` +
                     `<br>` +
-                    `<div id='action${i}ExpGain'></div>` +
-                    `<div id='action${i}HasFailed' style='display:none'>` +
-                        `<b>${_txt("actions>current_action>failed_attempts")}</b> <div id='action${i}Failed'></div><br>` +
-                        `<b>${_txt("actions>current_action>error")}</b> <div id='action${i}Error'></div>` +
+                    `<div role='status' aria-live='off' id='action${i}ExpGain'></div>` +
+                    `<div role='status' aria-live='off' id='action${i}HasFailed' style='display:none'>` +
+                        `<b role='label'>${_txt("actions>current_action>failed_attempts")}</b> <div role='status' aria-live='off' id='action${i}Failed'></div><br>` +
+                        `<b role='label'>${_txt("actions>current_action>error")}</b> <div role='status' aria-live='off' id='action${i}Error'></div>` +
                     `</div>` +
                 `</div>`;
         }
@@ -938,8 +943,10 @@ class View {
     ) {
         document.getElementById(`prc${varName}`).textContent = `${level}`;
         document.getElementById(`expBar${varName}`)?.style.setProperty("width", levelPrc);
+        document.getElementById(`expBar${varName}`)?.setAttribute("aria-valuenow", levelPrc.replace("%",""))
         document.getElementById(`progress${varName}`).textContent = intToString(levelPrc, 2);
         document.getElementById(`bar${varName}`).style.width = `${level}%`;
+        document.getElementById(`bar${varName}`).ariaValueNow = `${level}`;
         if (varName.startsWith("Survey") && !varName.endsWith("Global")) {
             this.updateGlobalSurvey(varName, town);
         }
@@ -962,11 +969,12 @@ class View {
 
     updateLockedHidden() {
         for (const action of totalActionList) {
-            const actionDiv = document.getElementById(`container${action.varName}`);
-            const infoDiv = document.getElementById(`infoContainer${action.varName}`);
-            const storyDiv = document.getElementById(`storyContainer${action.varName}`);
+            const actionDiv = htmlElement(`container${action.varName}`);
+            const infoDiv = htmlElement(`infoContainer${action.varName}`, false, false);
+            const storyDiv = htmlElement(`storyContainer${action.varName}`, false, false);
             if (action.allowed && getNumOnList(action.name) >= action.allowed()) {
                 addClassToDiv(actionDiv, "capped");
+                actionDiv.ariaDisabled = "true";
             } else if (action.unlocked()) {
                 if (infoDiv) {
                     removeClassFromDiv(infoDiv, "hidden");
@@ -976,8 +984,10 @@ class View {
                 }
                 removeClassFromDiv(actionDiv, "locked");
                 removeClassFromDiv(actionDiv, "capped");
+                actionDiv.ariaDisabled = "false";
             } else {
                 addClassToDiv(actionDiv, "locked");
+                actionDiv.ariaDisabled = "true";
                 if (infoDiv) {
                     addClassToDiv(infoDiv, "hidden");
                     if (action.varName.startsWith("Survey")) {
@@ -990,12 +1000,12 @@ class View {
             }
             if (action.visible()) {
                 removeClassFromDiv(actionDiv, "hidden");
-                if (storyDiv !== null) removeClassFromDiv(storyDiv, "hidden");
+                if (storyDiv) removeClassFromDiv(storyDiv, "hidden");
             } else {
                 addClassToDiv(actionDiv, "hidden");
-                if (storyDiv !== null) addClassToDiv(storyDiv, "hidden");
+                if (storyDiv) addClassToDiv(storyDiv, "hidden");
             }
-            if (storyDiv !== null) {
+            if (storyDiv) {
                 if (action.unlocked()) {
                     removeClassFromDiv(storyDiv, "hidden");
                 } else {
@@ -1054,8 +1064,8 @@ class View {
                             storyTooltipText += "</p>\n";
                     }
 
-                    if (document.getElementById(divName).children[2].innerHTML !== storyTooltipText) {
-                        document.getElementById(divName).children[2].innerHTML = storyTooltipText;
+                    if (htmlElement(`storyTooltip${action.varName}`).innerHTML !== storyTooltipText) {
+                        htmlElement(`storyTooltip${action.varName}`).innerHTML = storyTooltipText;
                         if (!init) {
                             showNotification(divName);
                             if (!unreadActionStories.includes(divName)) unreadActionStories.push(divName);
@@ -1198,24 +1208,27 @@ class View {
     /** @param {ActionOfType<"progress">} action @param {string} [label] */
     createActionProgress(action, varSuffix="", label, includeExpBar=true) {
         const totalDivText =
-        Raw.html`<div class='townStatContainer showthat'>
-            <div class='bold townLabel'>${label ?? action.labelDone}</div>
-            <div class='progressValue' id='prc${action.varName}${varSuffix}'>5</div><div class='percentSign'>%</div>
-            <div class='progressBars'>
-                ${includeExpBar ? `<div class='thinProgressBarUpper'><div id='expBar${action.varName}${varSuffix}' class='statBar townExpBar'></div></div>` : ""}
-                <div class='thinProgressBarLower'><div id='bar${action.varName}${varSuffix}' class='statBar townBar'></div></div>
+        Raw.html`<div role='none' class='townStatContainer showthat'>
+            <div role='label' id='label${action.varName}' class='bold townLabel'>${label ?? action.labelDone}</div>
+            <div role='status' aria-live='off' class='progressValue' id='prc${action.varName}${varSuffix}'>5</div><div role='none' class='percentSign'>%</div>
+            <div role='none' class='progressBars'>
+                ${includeExpBar ? Raw.html`<div class='thinProgressBarUpper' role='none'><div role='progressbar' aria-label='To next level' id='expBar${action.varName}${varSuffix}' class='statBar townExpBar'></div></div>` : ""}
+                <div class='thinProgressBarLower' role='none'><div role='progressbar' aria-label='Progress' id='bar${action.varName}${varSuffix}' class='statBar townBar'></div></div>
             </div>
 
-            <div class='showthis'>
+            <div role='tooltip' id='infoText${action.varName}' class='showthis'>
                 ${_txt("actions>tooltip>higher_done_percent_benefic")}<br>
                 <div class='bold'>${_txt("actions>tooltip>progress_label")}</div> <div id='progress${action.varName}${varSuffix}'></div>%
             </div>
-            <div class='hideVarButton far' onclick='view.toggleHidden("${action.varName}${varSuffix}")'></div>
+            <button aria-label='Toggle hiding this variable' class='hideVarButton far' onclick='view.toggleHidden("${action.varName}${varSuffix}")'></button>
         </div>`;
         const progressDiv = document.createElement("div");
         progressDiv.className = "townContainer progressType";
         progressDiv.id = `infoContainer${action.varName}${varSuffix}`;
         progressDiv.style.display = "";
+        progressDiv.setAttribute("aria-labelledby", `label${action.varName}`)
+        progressDiv.setAttribute("aria-describedby", `infoText${action.varName}`)
+        progressDiv.role = "row";
         progressDiv.innerHTML = totalDivText;
         townInfos[action.townNum].appendChild(progressDiv);
         if (towns[action.townNum].hiddenVars.has(`${action.varName}${varSuffix}`)) {
@@ -1308,7 +1321,7 @@ class View {
         const extraImagePositions = ["margin-top:17px;margin-left:5px;", "margin-top:17px;margin-left:-55px;", "margin-top:0px;margin-left:-55px;", "margin-top:0px;margin-left:5px;"];
         if (action.affectedBy) {
             for (let i = 0; i < action.affectedBy.length; i++) {
-                extraImage += `<img src='img/${camelize(action.affectedBy[i])}.svg' class='smallIcon' draggable='false' style='position:absolute;${extraImagePositions[i]}'>`;
+                extraImage += `<img role='graphics-symbol' aria-label='Affected by ${action.affectedBy[i]}' src='img/${camelize(action.affectedBy[i])}.svg' class='smallIcon' draggable='false' style='position:absolute;${extraImagePositions[i]}'>`;
             }
         }
         const isTravel = getTravelNum(action.name) != 0;
@@ -1316,9 +1329,11 @@ class View {
         const imageName = action.name.startsWith("Assassin") ? "assassin" : camelize(action.name);
         const unlockConditions = /<br>\s*Unlocked (.*?)(?:<br>|$)/is.exec(`${action.tooltip}${action.goldCost === undefined ? "" : action.tooltip2}`)?.[1]; // I hate this but wygd
         const lockedText = unlockConditions ? `${_txt("actions>tooltip>locked_tooltip")}<br>Will unlock ${unlockConditions}` : `${action.tooltip}${action.goldCost === undefined ? "" : action.tooltip2}`;
-        const totalDivText =
-            `<button
+        const totalDivText = Raw.html`
+            <button
                 id='container${action.varName}'
+                aria-labelledby='actionLabel${action.varName}'
+                aria-describedby='tooltip${action.varName}'
                 class='${divClass} actionOrTravelContainer ${action.type}ActionContainer showthat'
                 draggable='true'
                 ondragover='handleDragOver(event)'
@@ -1328,9 +1343,9 @@ class View {
                 onmouseover='view.updateAction("${action.varName}")'
                 onmouseout='view.updateAction(undefined)'
             >
-                <label>${action.label}</label><br>
-                <div style='position:relative'>
-                    <img src='img/${imageName}.svg' class='superLargeIcon' draggable='false'>${extraImage}
+                <label id='actionLabel${action.varName}'>${action.label}</label><br>
+                <div role='none' style='position:relative'>
+                    <img role='graphics-symbol' aria-labelledby='actionLabel${action.varName}' src='img/${imageName}.svg' class='superLargeIcon' draggable='false'>${extraImage}
                 </div>
                 ${statPie}
                 <div class='showthis when-unlocked' draggable='false'>
@@ -1343,7 +1358,7 @@ class View {
                     <div class='bold'>${_txt("actions>tooltip>exp_multiplier")}:</div><div id='expMult${action.varName}'>${action.expMult * 100}</div>%<br>
                     ${skillDetails}
                 </div>
-                <div class='showthis when-locked' draggable='false'>
+                <div role='tooltip' id='tooltip${action.varName}' class='showthis when-locked' draggable='false'>
                     ${lockedText}
                     <br>
                     ${lockedSkills}
@@ -1352,6 +1367,7 @@ class View {
             </button>`;
 
         const actionsDiv = document.createElement("div");
+        actionsDiv.role = "none";
         actionsDiv.innerHTML = totalDivText;
         actionOptionsTown[action.townNum].querySelector(`:scope > .${isTravel ? "travelDiv" : "actionDiv"}`).appendChild(actionsDiv);
 
@@ -1373,19 +1389,20 @@ class View {
                     storyTooltipText += "</p>";
             }
 
-            const storyDivText =
-                `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false' onmouseover='hideNotification("storyContainer${action.varName}")'>${action.label}
+            const storyDivText = Raw.html`
+                <div role='button' aria-disabled='true' aria-labelledby='storyLabel${action.varName}' aria-describedby='storyTooltip${action.varName}' id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false' onmouseover='hideNotification("storyContainer${action.varName}")'><label id='storyLabel${action.varName}'>${action.label}</label>
                     <br>
-                    <div style='position:relative'>
-                        <img src='img/${camelize(action.name)}.svg' class='superLargeIcon' draggable='false'>
-                        <div id='storyContainer${action.varName}Notification' class='notification storyNotification'></div>
+                    <div role='none' style='position:relative'>
+                        <img role='graphics-symbol' aria-labelledby='storyLabel${action.varName}' src='img/${camelize(action.name)}.svg' class='superLargeIcon' draggable='false'>
+                        <div role='status' id='storyContainer${action.varName}Notification' class='notification storyNotification'></div>
                     </div>
-                    <div class='showthisstory' draggable='false'>
+                    <div role='tooltip' id='storyTooltip${action.varName}' class='showthisstory' draggable='false'>
                         ${storyTooltipText}
                     </div>
                 </div>`;
 
             const storyDiv = document.createElement("div");
+            storyDiv.role = "none";
             storyDiv.innerHTML = storyDivText;
             actionStoriesTown[action.townNum].appendChild(storyDiv);
         }
@@ -1437,24 +1454,28 @@ class View {
 
     /** @param {ActionOfType<"limited">} action  */
     createTownInfo(action) {
+        const [info1, info2, info3] = action.infoTextLabels();
         const totalInfoText =
             // important that there be 8 element children of townInfoContainer (excluding the showthis popup and hideVarButton)
             Raw.html`
-            <div class='townInfoContainer showthat'>
-                <div class='bold townLabel'>${action.labelDone}</div>
-                <div class='numeric goodTemp' id='goodTemp${action.varName}'>0</div> <i class='fa fa-arrow-left'></i>
-                <div class='numeric good' id='good${action.varName}'>0</div> <i class='fa fa-arrow-left'></i>
-                <div class='numeric unchecked' id='unchecked${action.varName}'>0</div>
+            <div role='none' class='townInfoContainer showthat'>
+                <div role='label' class='bold townLabel' id='label${action.varName}'>${action.labelDone}</div>
+                <div role='status' aria-label='${info1}' aria-live='off' class='numeric goodTemp' id='goodTemp${action.varName}'>0</div> <i class='fa fa-arrow-left'></i>
+                <div role='status' aria-live='off' aria-label='${info2}' class='numeric good' id='good${action.varName}'>0</div> <i class='fa fa-arrow-left'></i>
+                <div role='status' aria-live='off' aria-label='${info3}' class='numeric unchecked' id='unchecked${action.varName}'>0</div>
                 <input type='checkbox' id='searchToggler${action.varName}' style='margin-left:10px;'>
                 <label for='searchToggler${action.varName}'> Lootable first</label>
-                <div class='showthis'>${action.infoText()}</div>
-                <div class='hideVarButton far' onclick='view.toggleHidden("${action.varName}")'></div>
+                <div role='tooltip' id='infoText${action.varName}' class='showthis'>${action.infoText()}</div>
+                <button aria-label='Toggle hiding this variable' class='hideVarButton far' onclick='view.toggleHidden("${action.varName}")'></button>
             </div><br>`;
 
         const infoDiv = document.createElement("div");
         infoDiv.className = "townContainer infoType";
         infoDiv.id = `infoContainer${action.varName}`;
         infoDiv.style.display = "";
+        infoDiv.setAttribute("aria-labelledby", `label${action.varName}`)
+        infoDiv.setAttribute("aria-describedby", `infoText${action.varName}`)
+        infoDiv.role = "row";
         infoDiv.innerHTML = totalInfoText;
         townInfos[action.townNum].appendChild(infoDiv);
         if (towns[action.townNum].hiddenVars.has(action.varName)) {
@@ -1468,10 +1489,11 @@ class View {
         const width = `style='width:calc(${91 / action.segments}% - 4px)'`;
         const varName = action.varName;
         for (let i = 0; i < action.segments; i++) {
-            pbars += `<div class='thickProgressBar showthat' ${width}>
-                        <div id='expBar${i}${varName}' class='segmentBar'></div>
-                        <div class='showthis' id='tooltip${i}${varName}'>
-                            <div id='segmentName${i}${varName}'></div><br>
+            pbars += Raw.html`
+                    <div role='cell' aria-labelledby='segmentName${i}${varName}' aria-describedby='tooltip${i}${varName}' class='thickProgressBar showthat' ${width}>
+                        <div role='progressbar' aria-label='Left to complete' id='expBar${i}${varName}' class='segmentBar'></div>
+                        <div role='tooltip' class='showthis' id='tooltip${i}${varName}'>
+                            <div role='label' id='segmentName${i}${varName}'></div><br>
                             <div class='bold'>Main Stat</div> <div id='mainStat${i}${varName}'></div><br>
                             <div class='bold'>Progress</div> <div id='progress${i}${varName}'></div> / <div id='progressNeeded${i}${varName}'></div>
                         </div>
@@ -1484,28 +1506,30 @@ class View {
         else if (varName === "TheSpire") mouseOver = "onmouseover='view.showDungeon(2)' onmouseout='view.showDungeon(undefined)'";
         const totalDivText =
             Raw.html`
-            <div class='townStatContainer' id='infoContainer${varName}'>
-                <div class='multipartLabel'>
-                    <div class='flexMargin'></div>
-                    <div class='bold townLabel' id='multiPartName${varName}'></div>
-                    <div class='completedInfo showthat' ${mouseOver}>
-                        <div class='bold'>${action.labelDone}</div>
-                        <div id='completed${varName}'></div>
-                        ${completedTooltip === "" ? "" : `<div class='showthis' id='completedContainer${varName}'>
+            <div role='none' class='townStatContainer' id='infoContainer${varName}'>
+                <div role='none' class='multipartLabel'>
+                    <div role='none' class='flexMargin'></div>
+                    <div role='label' aria-live='off' aria-roledescription='Current phase of task' class='bold townLabel' id='multiPartName${varName}'></div>
+                    <div role='none' class='completedInfo showthat' ${mouseOver}>
+                        <div role='label' aria-roledescription='Completion unit' id='labelDone${action.varName}' class='bold'>${action.labelDone}</div>
+                        <div role='status' aria-live='off' aria-labelledby='labelDone${action.varName}' id='completed${varName}'></div>
+                        ${completedTooltip === "" ? "" : `<div class='showthis' role='tooltip' id='completedContainer${varName}'>
                             ${completedTooltip}
                         </div>`}
                     </div>
-                    <div class='flexMargin'></div>
+                    <div role='none' class='flexMargin'></div>
                 </div>
-                <div class='multipartBars'>
+                <div role='row' class='multipartBars' aria-label='Segments of task'>
                     ${pbars}
                 </div>
-                <div class='hideVarButton far' onclick='view.toggleHidden("${action.varName}")'></div>
+                <button aria-label='Toggle hiding this variable' class='hideVarButton far' onclick='view.toggleHidden("${action.varName}")'></button>
             </div>`;
 
         const progressDiv = document.createElement("div");
         progressDiv.className = "townContainer multipartType";
         progressDiv.style.display = "";
+        progressDiv.setAttribute("aria-labelledby", `multiPartName${action.varName}`)
+        progressDiv.role = "row";
         progressDiv.innerHTML = totalDivText;
         townInfos[action.townNum].appendChild(progressDiv);
         if (towns[action.townNum].hiddenVars.has(action.varName)) {
@@ -1543,6 +1567,7 @@ class View {
         // update current segments
         if (document.getElementById(`progress${segment}${action.varName}`)) {
             document.getElementById(`expBar${segment}${action.varName}`).style.width = `${100 - 100 * curProgress / loopCost}%`;
+            document.getElementById(`expBar${segment}${action.varName}`).ariaValueNow = `${100 - 100 * curProgress / loopCost}`
             document.getElementById(`progress${segment}${action.varName}`).textContent = intToStringRound(curProgress);
             document.getElementById(`progressNeeded${segment}${action.varName}`).textContent = intToStringRound(loopCost);
         }
@@ -1878,7 +1903,7 @@ const actionStoriesTown = [];
 const townInfos = [];
 for (let i = 0; i <= 8; i++) {
     actionOptionsTown[i] = document.getElementById(`actionOptionsTown${i}`);
-    actionOptionsTown[i].append(Rendered.html`<div class="actionDiv"></div><div class="travelDiv">`);
+    actionOptionsTown[i].append(Rendered.html`<div class="actionDiv" role="none"></div><div class="travelDiv" role="none">`);
     actionStoriesTown[i] = document.getElementById(`actionStoriesTown${i}`);
     townInfos[i] = document.getElementById(`townInfo${i}`);
 }

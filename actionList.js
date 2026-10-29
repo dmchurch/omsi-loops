@@ -280,6 +280,12 @@ class Action extends Localizable {
                 <br><span class='bold'>${`${_txt("actions>tooltip>total_checked")}: `}</span><div id='checked${this.varName}'></div>`;
     };
 
+    infoTextLabels() {
+        return [_txt(`actions>${getXMLName(this.name)}>info_text1`),
+                _txt(`actions>${getXMLName(this.name)}>info_text2`),
+                _txt(`actions>${getXMLName(this.name)}>info_text3`)];
+    }
+
     /** @param {SkillName} skill */
     teachesSkill(skill) {
         // if we don't give exp in the skill we don't teach it

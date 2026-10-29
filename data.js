@@ -872,7 +872,7 @@ class DataSnapshot {
     /**
      * @param {O} object Key into this.objects and source of data
      * @param {string} name Hierarchical name for debug
-     * @param {(object: O) => Iterable<[string, any, boolean]>} getEntries
+     * @param {(object: O) => Iterable<[string, any, boolean?]>} getEntries
      * @returns {number} Number of records created
      */
     recordHierarchy(object, name, getEntries) {
@@ -892,7 +892,7 @@ class DataSnapshot {
         return count;
     }
 
-    /** @type {(object: O, name: string, getEntries: (object: O) => Iterable<[string, any, boolean]>, seen?: Set<O>) => Generator<[O, DataRecord | null]>} */
+    /** @type {(object: O, name: string, getEntries: (object: O) => Iterable<[string, any, boolean?]>, seen?: Set<O>) => Generator<[O, DataRecord | null]>} */
     *walkHierarchy(object, name, getEntries, seen) {
         if (!object) {
             throw new Error(`Called walkHierarchy for ${name} with falsy object ${object}`);
@@ -915,7 +915,7 @@ class DataSnapshot {
         yield [object, recorder.finalize()];
     }
 
-    /** @type {(object: O, recorder: DataRecorder, getEntries: (object: O) => Iterable<[string, any, boolean]>) => Generator<[string, any]>} */
+    /** @type {(object: O, recorder: DataRecorder, getEntries: (object: O) => Iterable<[string, any, boolean?]>) => Generator<[string, any]>} */
     *processRecord(object, recorder, getEntries) {
         for (const [prop, value, writable] of getEntries(object)) {
             if (writable !== false) {

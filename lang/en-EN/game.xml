@@ -14,6 +14,10 @@
             <b>Recent changes</b>
             ]]></version>
             -->
+            <version caption="Latest"><![CDATA[
+            <b>Recent changes</b>
+            • Added accessibility attributes to many elements. It is possible, though unlikely, that nothing has broken as a result.<br>
+            ]]></version>
             <version verNum="3P.1.2"><![CDATA[
             <b>Mar 23, 2025</b>
             • Fixed the first Wander action failing when fractional mana consumption is enabled in Extras.<br>
