@@ -217,8 +217,16 @@ class View {
         if (dungeonShowing !== undefined) this.updateSoulstoneChance(dungeonShowing);
         if (this.updateStatGraphNeeded) statGraph.update();
         this.updateTime();
+        this.propagateAriaLabels();
     };
 
+    propagateAriaLabels() {
+        for (const element of document.querySelectorAll("[aria-labelledby]")) {
+            if (element.ariaLabelledByElements?.length) {
+                element.ariaLabel = element.ariaLabelledByElements.map(e => e.ariaLabel ?? e.textContent).join(" ")
+            }
+        }
+    }
 
     adjustTooltipPosition(tooltipDiv) {
         // this is a no-op now, all repositioning happens dynamically on mouseover.
@@ -659,6 +667,10 @@ class View {
             inline: "nearest",
         })
     };
+    /** @param {NextActionEntry} a  */
+    getNextActionLabel(a, action = getActionPrototype(a.name)) {
+        return `Step ${a.actionId}: ${action.label} × ${a.loops}`
+    }
     updateNextActions() {
         const {scrollTop} = nextActionsDiv; // save the current scroll position
         if (options.predictor) {
@@ -669,11 +681,11 @@ class View {
             .selectAll(".nextActionContainer")
             .data(actions.next.map((a, index) => ({...a, actionId: a.actionId /* not enumerable by design */, index, action: getActionPrototype(a.name)})), a => a.actionId)
             .join(enter => enter
-                .append(({action, actionId: i, loops}) => Rendered.html`
+                .append(a => {const  {action, actionId: i} = a; return Rendered.html`
                     <div
                         id='nextActionContainer${i}'
                         role='row'
-                        aria-label='Step ${i+1}: ${action.label} × ${loops}'
+                        aria-label='${this.getNextActionLabel(a, action)}'
                         class='nextActionContainer small showthat'
                         ondragover=${handleDragOver}
                         ondrop=${handleDragDrop}
@@ -698,7 +710,7 @@ class View {
                         </div>
                         <ul class='koviko'></ul>
                     </div>
-                `.firstElementChild))
+                `.firstElementChild;}))
             .property("data-index", (_a, i) => i)
             .call(container => {
                 for (const {index} of towns) {
@@ -731,6 +743,7 @@ class View {
                 }
                 return color;
             })
+            .property("ariaLabel", a => this.getNextActionLabel(a, a.action))
             .call(container => container
                 .select("div.nextActionLoops > img")
                 .property("src", a => `img/${a.action.imageName}.svg`))
@@ -745,22 +758,37 @@ class View {
         nextActionsDiv.scrollTop = Math.max(nextActionsDiv.scrollTop, scrollTop); // scrolling down to see the new thing added is okay, scrolling up when you click an action button is not
     };
 
+    /** @param {AnyActionEntry} action */
+    getActionLoops(action) {
+        return action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops)
+    }
+
+    /** @param {AnyActionEntry} action */
+    getActionLoopsDone(action) {
+        return (action.loops - action.loopsLeft) > 99999 ? toSuffix(action.loops - action.loopsLeft) : formatNumber(action.loops - action.loopsLeft);
+    }
+
+    /** @param {AnyActionEntry} action */
+    getCurrentActionLabel(num, action, loopsDone = this.getActionLoopsDone(action), loops = this.getActionLoops(action)) {
+        return `Step ${num}: ${action.label} × ${loopsDone} / ${loops}`
+    }
+
     updateCurrentActionsDivs() {
         let totalDivText = "";
 
         // definite leak - need to remove listeners and image
         for (let i = 0; i < actions.current.length; i++) {
             const action = actions.current[i];
-            const actionLoops = action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops);
-            const actionLoopsDone = (action.loops - action.loopsLeft) > 99999 ? toSuffix(action.loops - action.loopsLeft) : formatNumber(action.loops - action.loopsLeft);
+            const actionLoops = this.getActionLoops(action);
+            const actionLoopsDone = this.getActionLoopsDone(action);
             const imageName = action.name.startsWith("Assassin") ? "assassin" : camelize(action.name);
             totalDivText += Raw.html`
-                <div class='curActionContainer small' onmouseover='view.mouseoverAction(${i}, true)' onmouseleave='view.mouseoverAction(${i}, false)'>
-                    <div class='curActionBar' id='action${i}Bar'></div>
-                    <div class='actionSelectedIndicator' id='action${i}Selected'></div>
-                    <img src='img/${imageName}.svg' class='smallIcon'>
-                    <div id='action${i}LoopsDone' style='margin-left:3px; border-left: 1px solid var(--action-separator-border);padding-left: 3px;'>${actionLoopsDone}</div>
-                    /<div id='action${i}Loops'>${actionLoops}</div>
+                <div role='row' id='action${i}Row' aria-label='${this.getCurrentActionLabel(i+1, action, actionLoopsDone, actionLoops)}' class='curActionContainer small' onmouseover='view.mouseoverAction(${i}, true)' onmouseleave='view.mouseoverAction(${i}, false)'>
+                    <div role='progressbar' class='curActionBar' id='action${i}Bar'></div>
+                    <div role='none' class='actionSelectedIndicator' id='action${i}Selected'></div>
+                    <img role='graphics-symbol' aria-labelledby='actionLabel${action.varName}' src='img/${imageName}.svg' class='smallIcon'>
+                    <div role='status' aria-label='Loops done' aria-live='off' id='action${i}LoopsDone' style='margin-left:3px; border-left: 1px solid var(--action-separator-border);padding-left: 3px;'>${actionLoopsDone}</div>
+                    /<div id='action${i}Loops' aria-label='Loops planned'>${actionLoops}</div>
                 </div>`;
         }
 
@@ -807,6 +835,7 @@ class View {
             document.getElementById(`action${index}Error`).textContent = action.errorMessage;
             document.getElementById(`action${index}HasFailed`).style.display = "";
             div.style.width = "100%";
+            div.ariaValueNow = "100";
             div.style.backgroundColor = "var(--cur-action-error-indicator)";
             div.style.height = "30%";
             div.style.marginTop = "5px";
@@ -822,9 +851,11 @@ class View {
             if (action.name === "Raise Zombie") setStoryFlag("failedRaiseZombie")
         } else if (action.loopsLeft === 0) {
             div.style.width = "100%";
+            div.ariaValueNow = "100";
             div.style.backgroundColor = "var(--cur-action-completed-background)";
         } else {
             div.style.width = `${100 * action.ticks / action.adjustedTicks}%`;
+            div.ariaValueNow = `${100 * action.ticks / action.adjustedTicks}`;
         }
 
         // only update tooltip if it's open
@@ -930,9 +961,9 @@ class View {
     updateCurrentActionLoops(index) {
         const action = actions.current[index];
         if (action !== undefined) {
-            document.getElementById(`action${index}LoopsDone`).textContent = (action.loops - action.loopsLeft) > 99999
-                ? toSuffix(action.loops - action.loopsLeft) : formatNumber(action.loops - action.loopsLeft);
-            document.getElementById(`action${index}Loops`).textContent = action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops);
+            htmlElement(`action${index}Row`).ariaLabel = this.getCurrentActionLabel(index + 1, action);
+            document.getElementById(`action${index}LoopsDone`).textContent = this.getActionLoopsDone(action);
+            document.getElementById(`action${index}Loops`).textContent = this.getActionLoops(action);
         }
     };
 

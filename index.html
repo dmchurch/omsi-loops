@@ -56,7 +56,7 @@
         <div role="none" id="timeBarContainer" style="width:100%;height:10px;background:var(--progress-bar-background);text-align:center;position:relative;">
             <div role="progressbar" aria-label="Mana remaining" id="timeBar" style="height:100%;width:20%;background-color:var(--progress-bar-mana-color);display:block;margin:auto;"></div>
         </div>
-        <menu role="menubar" aria-label="Main menu" id='menu' style='float: left; height: 30px; margin-left: 24px; margin-right: -24px;'></menu>
+        <menu role="navigation" aria-label="Main menu" id='menu' style='float: left; height: 30px; margin-left: 24px; margin-right: -24px;'></menu>
         <div role="list" aria-live="polite" aria-atomic="false" aria-label="Tracked resources" id='trackedResources'></div>
         <br>
         <div role="toolbar" aria-label="Playback controls" id='timeControls'></div>
@@ -448,7 +448,7 @@
                 <div role="heading" aria-labelledby="TownSelect" id="townWindow" style="width:100%;text-align:center;height:34px">
                     <button role="tab" aria-label="Previous zone" title="Previous zone" style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="townViewLeft" onclick="view.showTown(townsUnlocked[townsUnlocked.indexOf(townShowing)-1])"></button>
                     <div role="none" class="showthat">
-                        <div role="none" class="large bold"><select aria-label="Select zone" aria-describedby="townDesc" class="bold" style="text-align:center" id="TownSelect"></select></div>
+                        <div role="none" class="large bold"><select aria-label="Zone selector" aria-describedby="townDesc" class="bold" style="text-align:center" id="TownSelect"></select></div>
                         <div role="tooltip" id='townDesc' class='showthis'></div>
                     </div>
                     <button role="tab" aria-label="Next zone" title="Next zone" style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="townViewRight" onclick="view.showTown(townsUnlocked[townsUnlocked.indexOf(townShowing)+1])"></button>
@@ -496,9 +496,9 @@
             </section>
             <section aria-labelledby="actionLogTitle" id="actionLogContainer">
                 <div id="actionLogTitle" class="large bold block localized" data-lockey="actions>title_log" style="margin:10px auto 2px auto;text-align:center;"></div>
-                <ul id="actionLog">
-                    <li id="actionLogLoadPrevious" class="small italic localized" data-lockey="actions>log>load_previous" onclick="actionLog.loadHistory(5)"></li>
-                    <li id="actionLogLatest" class="small italic localized" data-lockey="actions>log>latest"></li>
+                <ul id="actionLog" role="log" aria-labelledby="actionLogTitle">
+                    <li role="button" id="actionLogLoadPrevious" class="small italic localized" data-lockey="actions>log>load_previous" onclick="actionLog.loadHistory(5)"></li>
+                    <li role="note" id="actionLogLatest" class="small italic localized" data-lockey="actions>log>latest"></li>
                 </ul>
             </section>
         </div>
