@@ -1494,8 +1494,8 @@ class View {
                 <div role='status' aria-label='${info1}' aria-live='off' class='numeric goodTemp' id='goodTemp${action.varName}'>0</div> <i class='fa fa-arrow-left'></i>
                 <div role='status' aria-live='off' aria-label='${info2}' class='numeric good' id='good${action.varName}'>0</div> <i class='fa fa-arrow-left'></i>
                 <div role='status' aria-live='off' aria-label='${info3}' class='numeric unchecked' id='unchecked${action.varName}'>0</div>
-                <input type='checkbox' id='searchToggler${action.varName}' style='margin-left:10px;'>
-                <label aria-label='${action.label}: Lootable first' for='searchToggler${action.varName}'> Lootable first</label>
+                <input aria-label='${action.label}: Lootable first' type='checkbox' id='searchToggler${action.varName}' style='margin-left:10px;'>
+                <label for='searchToggler${action.varName}'> Lootable first</label>
                 <div role='tooltip' id='infoText${action.varName}' class='showthis'>${action.infoText()}</div>
                 <button aria-label='Toggle hiding this variable' class='hideVarButton far' onclick='view.toggleHidden("${action.varName}")'></button>
             </div><br>`;
