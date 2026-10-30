@@ -14,8 +14,8 @@
             <b>Recent changes</b>
             ]]></version>
             -->
-            <version caption="Latest"><![CDATA[
-            <b>Recent changes</b>
+            <version verNum="3P.1.3"><![CDATA[
+            <b>October 29, 2026</b>
             • Added accessibility attributes to many elements. It is possible, though unlikely, that nothing has broken as a result.<br>
             • Removed browser warning for fixed Chromium bug.<br>
             ]]></version>
