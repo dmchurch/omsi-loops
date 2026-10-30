@@ -350,8 +350,8 @@
                     </div>
                 </div>
                 <div role="none" style="position: relative; left: 135px;">
-                    <button class="button" style="z-index: 0;" onclick="adjustActionListSize(100)"><i class="fas fa-plus"></i></button>
-                    <button class="button" style="z-index: 0;" onclick="adjustActionListSize(-100)"><i class="fas fa-minus"></i></button>
+                    <button aria-label="Make list taller" class="button" style="z-index: 0;" onclick="adjustActionListSize(100)"><i class="fas fa-plus"></i></button>
+                    <button aria-label="Make list shorter" class="button" style="z-index: 0;" onclick="adjustActionListSize(-100)"><i class="fas fa-minus"></i></button>
                 </div>
                 <br>
                 <div role="table" id="expandableList">
@@ -446,12 +446,12 @@
         <div role="none" id="townColumn" style="width:535px;vertical-align:top;">
             <section aria-label="Zone" id="shortTownColumn">
                 <div role="heading" aria-labelledby="TownSelect" id="townWindow" style="width:100%;text-align:center;height:34px">
-                    <button role="tab" aria-label="Previous zone" title="Previous zone" style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="townViewLeft" onclick="view.showTown(townsUnlocked[townsUnlocked.indexOf(townShowing)-1])"></button>
+                    <button aria-label="Previous zone" title="Previous zone" style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="townViewLeft" onclick="view.showTown(townsUnlocked[townsUnlocked.indexOf(townShowing)-1])"></button>
                     <div role="none" class="showthat">
                         <div role="none" class="large bold"><select aria-label="Zone selector" aria-describedby="townDesc" class="bold" style="text-align:center" id="TownSelect"></select></div>
                         <div role="tooltip" id='townDesc' class='showthis'></div>
                     </div>
-                    <button role="tab" aria-label="Next zone" title="Next zone" style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="townViewRight" onclick="view.showTown(townsUnlocked[townsUnlocked.indexOf(townShowing)+1])"></button>
+                    <button aria-label="Next zone" title="Next zone" style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="townViewRight" onclick="view.showTown(townsUnlocked[townsUnlocked.indexOf(townShowing)+1])"></button>
                     <button aria-label="Toggle hiding of variables" title="Toggle hiding of variables" id="hideVarsButton" class="far fa-eye" onclick="view.toggleHiding()"></button>
                 </div><br>
                 <div role="none" id="townInfos">
@@ -467,10 +467,10 @@
                 </div>
 
                 <div role="heading" aria-labelledby="actionsTitle" aria-describedby="actionsTooltip" id="townActionTitle" class="block showthat" style="text-align:center;">
-                    <button role="tab" style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="actionsViewLeft" onclick="view.showActions(false)"></button>
+                    <button style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="actionsViewLeft" onclick="view.showActions(false)"></button>
                     <span class='large bold' id="actionsTitle"></span>
                     <div role="tooltip" id="actionsTooltip" class='showthis localized' data-lockey="actions>tooltip>desc"></div>
-                    <button role="tab" style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="actionsViewRight" onclick="view.showActions(true)"></button>
+                    <button style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="actionsViewRight" onclick="view.showActions(true)"></button>
                 </div>
                 <div role="none" id="townActions">
                     <div role="tabpanel" id="actionOptionsTown0" class='actionOptions'></div>

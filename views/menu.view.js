@@ -12,7 +12,6 @@ const menuView = Views.registerView("menu", {
         html += Views.menu.htmlChallengeMenu();
         html += Views.menu.htmlTotalsMenu();
         html += Views.menu.htmlPrestigeMenu();
-        html += Views.menu.htmlWarningMenu();
         return html;
     },
     htmlMenusMenu() {
@@ -69,10 +68,11 @@ const menuView = Views.registerView("menu", {
         $(versions).each((_index, version) => {
             const caption = $(version).attr("caption");
             const verNum = $(version).attr("verNum");
+            const verId = verNum?.replace(/[ :]/g,'-') ?? caption?.replace(/[ :]/g,'-') ?? "unknown"
             html += /*html*/`
-                    <li role='button' aria-haspopup='dialog' aria-labelledby='version_${verNum}_label' aria-controls='version_${verNum}_text' class='showthat2' tabindex='0' ${verNum ? `data-verNum="${verNum}"` : ""}>
-                        <label id='version_${verNum}_label'>${caption ? caption : `${_txt("menu>changelog>meta>version_prefix")} ${verNum}`}</label>
-                        <p role='dialog' aria-labelledby='version_${verNum}_label' id='version_${verNum}_text' class='showthis2'>
+                    <li role='button' aria-haspopup='dialog' aria-labelledby='version_${verId}_label' aria-controls='version_${verId}_text' class='showthat2' tabindex='0' ${verNum ? `data-verNum="${verNum}"` : ""}>
+                        <label id='version_${verId}_label'>${caption ? caption : `${_txt("menu>changelog>meta>version_prefix")} ${verId}`}</label>
+                        <p role='dialog' aria-labelledby='version_${verId}_label' id='version_${verId}_text' class='showthis2'>
                             ${$(version).text()}
                         </p>
                     </li>`;
@@ -304,7 +304,7 @@ const menuView = Views.registerView("menu", {
     htmlTotalsMenu() {
         const html = 
         `<li role='button' aria-haspopup='dialog' aria-labelledby='totalsMenu_label' aria-controls='totalsMenu_popup' id='totalsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            <label id='totalsMenu_popup'>${_txt("menu>totals>meta>title")}</label>
+            <label id='totalsMenu_label'>${_txt("menu>totals>meta>title")}</label>
             <div role='dialog' aria-labelledby='totalsMenu_popup' id='_popup' class='showthisH'>
                 ${this.totals()}
             </div>
@@ -314,30 +314,12 @@ const menuView = Views.registerView("menu", {
     htmlPrestigeMenu() {
         const html = 
         `<li role='button' aria-haspopup='dialog' aria-labelledby='prestige_bonusesMenu_label' aria-controls='prestige_bonusesMenu_popup' id='prestige_bonusesMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            <label id='prestige_bonusesMenu_popup'>${_txt("menu>prestige_bonus>meta>title")}</label>
+            <label id='prestige_bonusesMenu_label'>${_txt("menu>prestige_bonus>meta>title")}</label>
             <div role='dialog' aria-labelledby='prestige_bonusesMenu_popup' id='_popup' class='showthisH'>
                 ${this.prestige_bonuses()}
             </div>
         </li>`;
         return html;
-    },
-    htmlWarningMenu() {
-        const html = 
-        `<li id='browser_warningMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH alert'>
-            CRITICAL ALERT
-            <div class='showthisH'>
-                <p>
-                There is currently a bug in the latest versions of Chrome (and browsers based on it, like Edge; your browser counts)
-                which can cause the game to fail unexpectedly. There is nothing we can do about this other than hope Google fixes what
-                they broke; if you have issues, export your save and import it into another browser like Firefox. If your game is working
-                and you have not updated this browser recently, do not update it right now or your game may break!
-                </p><p>
-                If you would like to help Google realize what they have accidentally broken, you can report that you are affected by
-                clicking the +1 button on <a href="https://issues.chromium.org/issues/401652934">the issue page</a>.
-                </p>
-            </div>
-        </li>`;
-        return navigator.vendor === 'Google Inc.' ? html : "";
     },
     challenges() {
         let html = 

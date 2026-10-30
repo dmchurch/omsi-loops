@@ -17,6 +17,7 @@
             <version caption="Latest"><![CDATA[
             <b>Recent changes</b>
             • Added accessibility attributes to many elements. It is possible, though unlikely, that nothing has broken as a result.<br>
+            • Removed browser warning for fixed Chromium bug.<br>
             ]]></version>
             <version verNum="3P.1.2"><![CDATA[
             <b>Mar 23, 2025</b>

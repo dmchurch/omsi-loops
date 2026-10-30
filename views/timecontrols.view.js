@@ -32,9 +32,9 @@ const timeControlsView = Views.registerView("timeControls", {
                     <div role='label' id='story_title' class='large bold'>${_txt("time_controls>story_title")}</div>
                     <div role='alert' id='newStory' style='color:var(--alert-color);display:none;'>(!)</div>
                     <div role='tooltip' id='story_tooltip' class='showthisH' style='width:400px;'>
-                        <button style='margin-left:175px;' class='actionIcon fa fa-arrow-left control' id='storyLeft' onclick='view.updateStory(storyShowing-1)'></button>
+                        <button aria-label='Previous story' style='margin-left:175px;' class='actionIcon fa fa-arrow-left control' id='storyLeft' onclick='view.updateStory(storyShowing-1)'></button>
                         <div style='' id='storyPage' class='bold control'></div>
-                        <button style='' class='actionIcon fa fa-arrow-right control' id='storyRight' onclick='view.updateStory(storyShowing+1)'></button>
+                        <button aria-label='Next story' style='' class='actionIcon fa fa-arrow-right control' id='storyRight' onclick='view.updateStory(storyShowing+1)'></button>
                         ${timeControlsView.stories()}
                     </div>
                 </div>
