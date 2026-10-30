@@ -305,7 +305,7 @@ const menuView = Views.registerView("menu", {
         const html = 
         `<li role='button' aria-haspopup='dialog' aria-labelledby='totalsMenu_label' aria-controls='totalsMenu_popup' id='totalsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
             <label id='totalsMenu_label'>${_txt("menu>totals>meta>title")}</label>
-            <div role='dialog' aria-labelledby='totalsMenu_popup' id='_popup' class='showthisH'>
+            <div role='dialog' aria-labelledby='totalsMenu_popup' id='totalsMenu_popup' class='showthisH'>
                 ${this.totals()}
             </div>
         </li>`;
@@ -315,7 +315,7 @@ const menuView = Views.registerView("menu", {
         const html = 
         `<li role='button' aria-haspopup='dialog' aria-labelledby='prestige_bonusesMenu_label' aria-controls='prestige_bonusesMenu_popup' id='prestige_bonusesMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
             <label id='prestige_bonusesMenu_label'>${_txt("menu>prestige_bonus>meta>title")}</label>
-            <div role='dialog' aria-labelledby='prestige_bonusesMenu_popup' id='_popup' class='showthisH'>
+            <div role='dialog' aria-labelledby='prestige_bonusesMenu_popup' id='prestige_bonusesMenu_popup' class='showthisH'>
                 ${this.prestige_bonuses()}
             </div>
         </li>`;
