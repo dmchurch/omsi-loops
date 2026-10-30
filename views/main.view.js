@@ -668,8 +668,8 @@ class View {
         })
     };
     /** @param {NextActionEntry} a  */
-    getNextActionLabel(a, action = getActionPrototype(a.name)) {
-        return `Step ${a.actionId}: ${action.label} × ${a.loops}`
+    getNextActionLabel(num = 0, a, action = getActionPrototype(a.name)) {
+        return `Step ${num}: ${action.label} × ${a.loops}`
     }
     updateNextActions() {
         const {scrollTop} = nextActionsDiv; // save the current scroll position
@@ -681,11 +681,11 @@ class View {
             .selectAll(".nextActionContainer")
             .data(actions.next.map((a, index) => ({...a, actionId: a.actionId /* not enumerable by design */, index, action: getActionPrototype(a.name)})), a => a.actionId)
             .join(enter => enter
-                .append(a => {const  {action, actionId: i} = a; return Rendered.html`
+                .append((a, idx) => {const  {action, actionId: i} = a; return Rendered.html`
                     <div
                         id='nextActionContainer${i}'
                         role='row'
-                        aria-label='${this.getNextActionLabel(a, action)}'
+                        aria-label='${this.getNextActionLabel(idx + 1, a)}'
                         class='nextActionContainer small showthat'
                         ondragover=${handleDragOver}
                         ondrop=${handleDragDrop}
@@ -743,7 +743,7 @@ class View {
                 }
                 return color;
             })
-            .property("ariaLabel", a => this.getNextActionLabel(a, a.action))
+            .property("ariaLabel", (a, idx) => this.getNextActionLabel(idx + 1, a, a.action))
             .call(container => container
                 .select("div.nextActionLoops > img")
                 .property("src", a => `img/${a.action.imageName}.svg`))
@@ -1495,7 +1495,7 @@ class View {
                 <div role='status' aria-live='off' aria-label='${info2}' class='numeric good' id='good${action.varName}'>0</div> <i class='fa fa-arrow-left'></i>
                 <div role='status' aria-live='off' aria-label='${info3}' class='numeric unchecked' id='unchecked${action.varName}'>0</div>
                 <input type='checkbox' id='searchToggler${action.varName}' style='margin-left:10px;'>
-                <label for='searchToggler${action.varName}'> Lootable first</label>
+                <label aria-label='${action.label}: Lootable first' for='searchToggler${action.varName}'> Lootable first</label>
                 <div role='tooltip' id='infoText${action.varName}' class='showthis'>${action.infoText()}</div>
                 <button aria-label='Toggle hiding this variable' class='hideVarButton far' onclick='view.toggleHidden("${action.varName}")'></button>
             </div><br>`;
