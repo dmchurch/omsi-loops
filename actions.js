@@ -84,7 +84,21 @@ class Actions {
         availableMana ??= 1;
         availableMana = Mana.floor(availableMana);
 
+        const previousAction = this.currentAction;
+        const previousPos = this.currentPos;
+
         const curAction = this.getNextValidAction();
+
+        if (previousAction !== null && curAction !== previousAction)
+        {
+            //Mana remaining was calculated before we actually deducted the mana cost.  If this is the
+            //final time we run the action, then calculate it one last time.
+            {
+                previousAction.manaRemaining = timeNeeded - timer;
+                view.requestUpdate("updateCurrentActionLoops", previousPos);
+            }
+        }
+
         // out of actions
         if (!curAction) {
             shouldRestart = true;
